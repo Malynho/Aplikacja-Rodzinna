@@ -1,0 +1,31 @@
+{
+  "app": { "name": "Familien-App" },
+  "auth": {
+    "signInGoogle": "Mit Google anmelden",
+    "signOut": "Abmelden",
+    "signInError": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
+  },
+  "greeting": "Willkommen zurück, {{name}}",
+  "week": "KW {{number}}",
+  "nav": {
+    "home": "Start",
+    "shopping": "Einkaufsliste",
+    "todo": "To-do",
+    "notes": "Notizen",
+    "admin": "Verwaltung",
+    "menu": "Menü"
+  },
+  "module": { "comingSoon": "Dieses Modul folgt bald." },
+  "theme": { "light": "Hell", "dark": "Dunkel", "system": "System" },
+  "weather": {
+    "loading": "Wetter wird geladen…",
+    "error": "Keine Wetterdaten",
+    "clear": "Klar",
+    "cloudy": "Bewölkt",
+    "fog": "Nebel",
+    "drizzle": "Nieselregen",
+    "rain": "Regen",
+    "snow": "Schnee",
+    "thunder": "Gewitter"
+  }
+}

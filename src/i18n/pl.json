@@ -1,0 +1,31 @@
+{
+  "app": { "name": "Aplikacja Rodzinna" },
+  "auth": {
+    "signInGoogle": "Zaloguj się przez Google",
+    "signOut": "Wyloguj",
+    "signInError": "Nie udało się zalogować. Spróbuj ponownie."
+  },
+  "greeting": "Witamy ponownie, {{name}}",
+  "week": "KW {{number}}",
+  "nav": {
+    "home": "Start",
+    "shopping": "Einkaufsliste",
+    "todo": "To-do",
+    "notes": "Notizen",
+    "admin": "Verwaltung",
+    "menu": "Menu"
+  },
+  "module": { "comingSoon": "Ten moduł pojawi się wkrótce." },
+  "theme": { "light": "Jasny", "dark": "Ciemny", "system": "Systemowy" },
+  "weather": {
+    "loading": "Ładowanie pogody…",
+    "error": "Brak danych pogodowych",
+    "clear": "Bezchmurnie",
+    "cloudy": "Pochmurno",
+    "fog": "Mgła",
+    "drizzle": "Mżawka",
+    "rain": "Deszcz",
+    "snow": "Śnieg",
+    "thunder": "Burza"
+  }
+}
