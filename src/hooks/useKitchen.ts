@@ -16,6 +16,7 @@ import {
   type ReceiptResult,
   type ShoppingItem,
 } from '../pages/kitchen/products'
+import type { Ingredient, IngredientValues, MealWish, Recipe, RecipeValues, WishValues } from '../pages/kitchen/recipeTypes'
 
 const RECENT_LIMIT = 10
 
@@ -24,8 +25,21 @@ type ErrorKey = 'alreadyOnList' | 'error'
 
 // Merges a Realtime row into the map. Idempotent, so our own change arriving twice is harmless,
 // and an older event never overwrites a newer row.
+// A DELETE event (only recipe ingredients are deleted for real) removes the row.
 function applyChange<T extends Row>(set: Dispatch<SetStateAction<Map<string, T>>>) {
-  return (payload: { new: Record<string, unknown> }) => {
+  return (payload: { eventType?: string; new: Record<string, unknown>; old?: Record<string, unknown> }) => {
+    if (payload.eventType === 'DELETE') {
+      const id = payload.old?.id as string | undefined
+      if (id) {
+        set((prev) => {
+          if (!prev.has(id)) return prev
+          const next = new Map(prev)
+          next.delete(id)
+          return next
+        })
+      }
+      return
+    }
     const row = payload.new as unknown as T
     if (!row?.id) return
     set((prev) => {
@@ -42,12 +56,15 @@ export function useKitchen(familyId: string) {
   const [products, setProducts] = useState<Map<string, Product>>(new Map())
   const [items, setItems] = useState<Map<string, ShoppingItem>>(new Map())
   const [pantry, setPantry] = useState<Map<string, PantryItem>>(new Map())
+  const [recipes, setRecipes] = useState<Map<string, Recipe>>(new Map())
+  const [ingredients, setIngredients] = useState<Map<string, Ingredient>>(new Map())
+  const [wishes, setWishes] = useState<Map<string, MealWish>>(new Map())
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState<ErrorKey | null>(null)
   const subscribed = useRef(false)
 
   const load = useCallback(async () => {
-    const [p, pan, open, deleted] = await Promise.all([
+    const [p, pan, open, deleted, rec, ing, wish] = await Promise.all([
       supabase.from('products').select('*').eq('family_id', familyId),
       supabase.from('pantry_items').select('*').eq('family_id', familyId),
       supabase.from('shopping_items').select('*').eq('family_id', familyId).is('deleted_at', null),
@@ -59,10 +76,16 @@ export function useKitchen(familyId: string) {
         .eq('checked', false) // only manually removed items; bought ones are deleted + checked
         .order('deleted_at', { ascending: false })
         .limit(RECENT_LIMIT),
+      supabase.from('recipes').select('*').eq('family_id', familyId), // removed ones too: wishes may point to them
+      supabase.from('recipe_ingredients').select('*').eq('family_id', familyId),
+      supabase.from('meal_wishes').select('*').eq('family_id', familyId).is('deleted_at', null),
     ])
     setProducts(new Map((p.data ?? []).map((r: Product) => [r.id, r])))
     setPantry(new Map((pan.data ?? []).map((r: PantryItem) => [r.id, r])))
     setItems(new Map([...(open.data ?? []), ...(deleted.data ?? [])].map((r: ShoppingItem) => [r.id, r])))
+    setRecipes(new Map((rec.data ?? []).map((r: Recipe) => [r.id, r])))
+    setIngredients(new Map((ing.data ?? []).map((r: Ingredient) => [r.id, r])))
+    setWishes(new Map((wish.data ?? []).map((r: MealWish) => [r.id, r])))
     setLoaded(true)
   }, [familyId])
 
@@ -73,6 +96,9 @@ export function useKitchen(familyId: string) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products', filter }, applyChange(setProducts))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_items', filter }, applyChange(setItems))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'pantry_items', filter }, applyChange(setPantry))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes', filter }, applyChange(setRecipes))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'recipe_ingredients', filter }, applyChange(setIngredients))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_wishes', filter }, applyChange(setWishes))
       .subscribe((status) => {
         subscribed.current = status === 'SUBSCRIBED'
         // Load after subscribing so no change is missed; also (re)load when the connection fails or returns.
@@ -111,10 +137,24 @@ export function useKitchen(familyId: string) {
     }
   }, [products, items, pantry])
 
+  const recipeView = useMemo(() => {
+    const byRecipe = new Map<string, Ingredient[]>()
+    for (const i of [...ingredients.values()].sort((a, b) => a.sort - b.sort)) {
+      byRecipe.set(i.recipe_id, [...(byRecipe.get(i.recipe_id) ?? []), i])
+    }
+    return {
+      recipes: [...recipes.values()].filter((r) => !r.deleted_at),
+      wishes: [...wishes.values()].filter((w) => !w.deleted_at),
+      ingredientsByRecipe: byRecipe,
+    }
+  }, [recipes, ingredients, wishes])
+
   const hasSeeded = useMemo(() => [...products.values()].some((p) => p.seed_key), [products])
 
   return {
     ...view,
+    ...recipeView,
+    recipeById: recipes,
     productById: products,
     loaded,
     hasSeeded,
@@ -130,7 +170,7 @@ export function useKitchen(familyId: string) {
           .eq('id', id),
       ),
     // Soft delete / restore for both tables (deleted_at = null means active).
-    setDeleted: (table: 'shopping_items' | 'products', ids: string[], deleted: boolean) =>
+    setDeleted: (table: 'shopping_items' | 'products' | 'recipes' | 'meal_wishes', ids: string[], deleted: boolean) =>
       run(
         supabase
           .from(table)
@@ -186,6 +226,18 @@ export function useKitchen(familyId: string) {
       if (!subscribed.current) await load()
       return err ? null : (data as ReceiptResult)
     },
+    // Recipe + ingredients in one transaction (rid = null creates). Returns the recipe id or null on failure.
+    saveRecipe: async (rid: string | null, recipe: RecipeValues, list: IngredientValues[]): Promise<string | null> => {
+      const { data, error: err } = await supabase.rpc('save_recipe', { fid: familyId, rid, recipe, ingredients: list })
+      setError(err ? 'error' : null)
+      if (!subscribed.current) await load()
+      return err ? null : (data as string)
+    },
+    addWish: (values: WishValues) => run(supabase.from('meal_wishes').insert({ family_id: familyId, ...values })),
+    updateWish: (id: string, values: WishValues) => run(supabase.from('meal_wishes').update(values).eq('id', id)),
+    // Puts missing packs on the shopping list (max of the existing and the missing quantity). Returns false on failure.
+    addMissing: (needs: { product_id: string; qty: number }[]) =>
+      run(supabase.rpc('add_missing_to_list', { fid: familyId, needs })),
     // Adds the starter catalog once; existing (family_id, seed_key) pairs are skipped.
     seed: () =>
       run(

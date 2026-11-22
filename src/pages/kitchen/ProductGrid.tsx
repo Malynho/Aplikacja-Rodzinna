@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CATEGORIES, CATEGORY_ICONS, productLabel, type Category, type PantryStatus, type Product } from './products'
+import { CollapsibleSection, useOpenSections } from '../../components/CollapsibleSection'
+import { CATEGORIES, CATEGORY_ICONS, productLabel, type PantryStatus, type Product } from './products'
 
 interface Props {
   products: Product[]
@@ -16,24 +17,6 @@ interface Props {
   alwaysControls?: boolean
   isLow?: (productId: string) => boolean
   expandAll?: boolean // open every category with results (e.g. while a filter is on); not remembered
-}
-
-// Remembers which categories are expanded for the current browser session only.
-function loadOpen(key: string): Set<Category> {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(key) ?? '[]')
-    return new Set(Array.isArray(parsed) ? parsed.filter((c) => CATEGORIES.includes(c)) : [])
-  } catch {
-    return new Set()
-  }
-}
-
-function saveOpen(key: string, open: Set<Category>) {
-  try {
-    sessionStorage.setItem(key, JSON.stringify([...open]))
-  } catch {
-    // storage unavailable: the state just is not remembered
-  }
 }
 
 // Collapsible category sections with tiles and search. Tap = +1; + and − appear once the item is on the list.
@@ -52,16 +35,9 @@ export function ProductGrid({
 }: Props) {
   const { t, i18n } = useTranslation()
   const [query, setQuery] = useState('')
-  const [open, setOpen] = useState(() => loadOpen(storageKey))
+  const { open, toggle } = useOpenSections(storageKey)
   const q = query.trim().toLowerCase()
   const forced = q !== '' || !!expandAll // a search or a filter opens every category with results
-
-  function toggle(category: Category) {
-    const next = new Set(open)
-    if (!next.delete(category)) next.add(category)
-    setOpen(next)
-    saveOpen(storageKey, next)
-  }
 
   const named = products
     .map((p) => ({ product: p, name: productLabel(p, t) })) // name + package size; the search covers both
@@ -84,23 +60,16 @@ export function ProductGrid({
         const expanded = forced || open.has(category)
         const low = isLow ? group.filter((x) => isLow(x.product.id)).length : 0
         return (
-          <section key={category} className="section">
-            <h3>
-              <button
-                className="category-head"
-                aria-expanded={expanded}
-                onClick={() => !forced && toggle(category)}
-              >
-                <span className="chevron" aria-hidden="true">
-                  ›
-                </span>
-                <span>{CATEGORY_ICONS[category]}</span>
-                <span>{t(`kitchen.categories.${category}`)}</span>
-                <span className="muted">{group.length}</span>
-                {low > 0 && <span className="category-low">{t('kitchen.pantry.lowInCategory', { count: low })}</span>}
-              </button>
-            </h3>
-            {expanded && (
+          <CollapsibleSection
+            key={category}
+            icon={CATEGORY_ICONS[category]}
+            title={t(`kitchen.categories.${category}`)}
+            count={group.length}
+            extra={low > 0 && <span className="category-low">{t('kitchen.pantry.lowInCategory', { count: low })}</span>}
+            expanded={expanded}
+            locked={forced}
+            onToggle={() => toggle(category)}
+          >
             <div className="tiles">
               {group.map(({ product, name }) => {
                 const qty = quantities.get(product.id) ?? 0
@@ -135,8 +104,7 @@ export function ProductGrid({
                 )
               })}
             </div>
-            )}
-          </section>
+          </CollapsibleSection>
         )
       })}
     </>

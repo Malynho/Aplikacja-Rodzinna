@@ -47,7 +47,7 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
   Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
-  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry. Next: 0009.
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes. Next: 0012.
   Pantry triggers: bought shopping item (checked false->true) raises `ist`; a falling `ist` sets the open shopping
   item to `soll - ist` (`add_pantry_shortages`). Neither trigger touches the column that fires the other (no loop).
 - Applying migrations (Supabase CLI 3.x targets the local stack by default, so the scripts always pass `--remote`
@@ -60,6 +60,9 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   replies. Receipt photos are never stored or logged; the model's output is validated server-side.
 - Products may have an optional package size (`pack_size` + `pack_unit`, stored as g/kg/ml/l/pcs). It is only a label
   (`productLabel`): Ist, Soll, Min and the shopping list always count PACKS (integers).
+- Recipes (`recipes`, `recipe_ingredients`, `meal_wishes`, 0011): added by hand only, each keeps the language it was written
+  in. Pantry check = one pure function `src/lib/recipeNeeds.ts` (sums per product BEFORE comparing with `ist`, skips staples);
+  `add_missing_to_list` sets the open list quantity to max(existing, missing); recipes are saved atomically by `save_recipe`.
 - Receipt scanning (`scan-receipt` + `apply_receipt`): nothing changes before the user confirms; the approval
   button is locked from the first click until saving ends.
 - Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`

@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { KITCHEN_TABS, Kitchen } from './pages/kitchen/Kitchen'
+import { Kitchen } from './pages/kitchen/Kitchen'
 import { Pantry } from './pages/kitchen/Pantry'
 import { Shopping } from './pages/kitchen/Shopping'
 import { AuthProvider } from './auth/AuthProvider'
@@ -11,6 +11,8 @@ import { Layout, NAV_ITEMS } from './components/Layout'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
 import { ModulePage } from './pages/ModulePage'
+import { MealPlan } from './pages/kitchen/MealPlan'
+import { Recipes } from './pages/kitchen/Recipes'
 
 export default function App() {
   return (
@@ -28,9 +30,8 @@ export default function App() {
                   <Route index element={<Navigate to="shopping" replace />} />
                   <Route path="shopping" element={<Shopping />} />
                   <Route path="pantry" element={<Pantry />} />
-                  {KITCHEN_TABS.filter((tab) => !['shopping', 'pantry'].includes(tab.to)).map(({ to, key }) => (
-                    <Route key={to} path={to} element={<ModulePage titleKey={`kitchen.tabs.${key}`} />} />
-                  ))}
+                  <Route path="recipes" element={<Recipes />} />
+                  <Route path="meal-plan" element={<MealPlan />} />
                 </Route>
                 {NAV_ITEMS.filter((i) => !['/', '/admin', '/kitchen'].includes(i.to)).map(({ to, key }) => (
                   <Route key={to} path={to} element={<ModulePage titleKey={`nav.${key}`} />} />
