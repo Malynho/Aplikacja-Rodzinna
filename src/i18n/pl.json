@@ -109,6 +109,7 @@
     },
     "custom": {
       "title": "Własne produkty",
+      "pack": "Opakowanie (opcjonalnie)",
       "add": "Dodaj produkt",
       "edit": "Edytuj",
       "name": "Nazwa",
@@ -121,6 +122,31 @@
       "archivedToast": "Zarchiwizowano: {{name}}",
       "unarchive": "Przywróć",
       "empty": "Brak własnych produktów."
+    },
+    "units": { "g": "g", "kg": "kg", "ml": "ml", "l": "l", "pcs": "szt" },
+    "receipt": {
+      "scan": "Skanuj paragon",
+      "scanning": "Odczytywanie paragonu…",
+      "privacy": "Zdjęcie jest wysyłane do odczytu i nie jest zapisywane.",
+      "reviewTitle": "Sprawdź paragon",
+      "unmatched": "Brak dopasowania",
+      "uncertain": "Niepewne – sprawdź",
+      "suggestion": "Propozycja: {{name}}",
+      "skip": "Pomiń",
+      "newProduct": "Nowy produkt…",
+      "newLabel": "Nowy produkt: {{name}}",
+      "quantity": "Ilość",
+      "approve": "Zatwierdź",
+      "approving": "Zapisywanie…",
+      "done": "Zapisano paragon: z listy zdjęto {{cleared}}, do zapasów dodano {{pantry}}",
+      "errors": {
+        "forbidden": "Brak uprawnień do skanowania paragonów.",
+        "limit_reached": "Dzienny limit skanów został wykorzystany.",
+        "bad_request": "Nie udało się przesłać zdjęcia.",
+        "scan_failed": "Nie udało się odczytać paragonu. Spróbuj ponownie.",
+        "image": "Nie udało się przetworzyć zdjęcia.",
+        "empty": "Na zdjęciu nie znaleziono żadnych pozycji."
+      }
     },
     "pantry": {
       "filterAll": "Wszystko",

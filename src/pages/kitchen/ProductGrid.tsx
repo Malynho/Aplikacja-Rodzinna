@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CATEGORIES, CATEGORY_ICONS, productName, type Category, type PantryStatus, type Product } from './products'
+import { CATEGORIES, CATEGORY_ICONS, productLabel, type Category, type PantryStatus, type Product } from './products'
 
 interface Props {
   products: Product[]
@@ -64,7 +64,7 @@ export function ProductGrid({
   }
 
   const named = products
-    .map((p) => ({ product: p, name: productName(p, t) }))
+    .map((p) => ({ product: p, name: productLabel(p, t) })) // name + package size; the search covers both
     .filter((x) => x.name.toLowerCase().includes(q))
     .sort((a, b) => a.name.localeCompare(b.name, i18n.language))
 

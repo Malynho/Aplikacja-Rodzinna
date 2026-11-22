@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CATEGORIES, productName, type Product, type ShoppingItem } from './products'
+import { CATEGORIES, productLabel, type Product, type ShoppingItem } from './products'
 
 const LEAVE_MS = 250 // fade-out time before a ticked item is written as bought
 
@@ -51,7 +51,7 @@ export function ShoppingList({ items, recent, products, canWrite, onChecked, onQ
     const p = products.get(item.product_id)
     return {
       emoji: p?.emoji ?? '',
-      name: p ? productName(p, t) : '',
+      name: p ? productLabel(p, t) : '',
       order: p ? CATEGORIES.indexOf(p.category) : CATEGORIES.length,
     }
   }

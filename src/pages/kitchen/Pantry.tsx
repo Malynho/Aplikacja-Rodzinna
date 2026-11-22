@@ -5,7 +5,7 @@ import { useModuleAccess } from '../../hooks/useModuleAccess'
 import type { KitchenData } from '../../hooks/useKitchen'
 import { PantryEditor } from './PantryEditor'
 import { ProductGrid } from './ProductGrid'
-import { pantryStatus, productName, runningLow, type PantryValues } from './products'
+import { pantryStatus, productLabel, runningLow, type Pack, type PantryValues } from './products'
 
 type Filter = 'all' | 'low'
 
@@ -32,8 +32,14 @@ export function Pantry() {
   }).length
   const product = editing ? shop.products.find((p) => p.id === editing) : undefined
 
-  function save(values: PantryValues) {
-    if (product) shop.savePantry(product.id, values)
+  function save(values: PantryValues, pack: Pack) {
+    if (product) {
+      shop.savePantry(product.id, values)
+      // the package size belongs to the product; write it only when it changed
+      if (pack.pack_size !== product.pack_size || pack.pack_unit !== product.pack_unit) {
+        shop.setPack(product.id, pack)
+      }
+    }
     setEditing(null)
   }
 
@@ -66,8 +72,9 @@ export function Pantry() {
           <PantryEditor
             key={product.id}
             emoji={product.emoji}
-            name={productName(product, t)}
+            name={productLabel(product, t)}
             item={pantry.get(product.id)}
+            pack={{ pack_size: product.pack_size, pack_unit: product.pack_unit }}
             onSave={save}
             onUsed={used}
             onClose={() => setEditing(null)}

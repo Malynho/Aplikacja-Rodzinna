@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ProductForm } from './ProductForm'
-import type { Product, ProductValues } from './products'
+import { productLabel, type Product, type ProductValues } from './products'
 
 interface Props {
   products: Product[] // custom products only (seed_key is null)
@@ -41,7 +41,13 @@ export function OwnProducts({ products, archived, canWrite, onCreate, onUpdate, 
             editing === p.id ? (
               <ProductForm
                 key={p.id}
-                initial={{ name: p.name ?? '', emoji: p.emoji, category: p.category }}
+                initial={{
+                  name: p.name ?? '',
+                  emoji: p.emoji,
+                  category: p.category,
+                  pack_size: p.pack_size,
+                  pack_unit: p.pack_unit,
+                }}
                 onSubmit={(v) => save(p.id, v)}
                 onCancel={() => setEditing(null)}
               />
@@ -49,7 +55,7 @@ export function OwnProducts({ products, archived, canWrite, onCreate, onUpdate, 
               <div key={p.id} className="list-row card">
                 <span className="grow">
                   <span className="list-emoji">{p.emoji}</span>
-                  {p.name}
+                  {productLabel(p, t)}
                 </span>
                 {canWrite && (
                   <>
@@ -74,7 +80,7 @@ export function OwnProducts({ products, archived, canWrite, onCreate, onUpdate, 
               <div key={p.id} className="list-row card">
                 <span className="grow muted">
                   <span className="list-emoji">{p.emoji}</span>
-                  {p.name}
+                  {productLabel(p, t)}
                 </span>
                 {canWrite && (
                   <button className="link-btn" onClick={() => onUnarchive(p)}>

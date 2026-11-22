@@ -382,6 +382,22 @@ h3 {
   font-weight: 600;
 }
 
+/* Receipt confirmation: unmatched lines stand out. */
+.card.unmatched {
+  outline: 2px solid var(--warning);
+}
+
+.tag-warning {
+  color: var(--warning);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.qty-input {
+  width: 5.5rem;
+  flex: none;
+}
+
 .field {
   display: grid;
   gap: 4px;

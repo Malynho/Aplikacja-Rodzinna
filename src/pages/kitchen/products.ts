@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next'
+import i18n from '../../i18n'
 
 export const CATEGORIES = [
   'fruitVeg',
@@ -37,8 +38,17 @@ export const EMOJI_CHOICES = [
   '🌿', '🍕', '🧊', '🛒',
 ]
 
+// Package size units (stored as-is; labels come from kitchen.units.<unit>).
+export const PACK_UNITS = ['g', 'kg', 'ml', 'l', 'pcs'] as const
+export type PackUnit = (typeof PACK_UNITS)[number]
+
+export interface Pack {
+  pack_size: number | null
+  pack_unit: PackUnit | null
+}
+
 // Rows as stored in the database (products.deleted_at = archived).
-export interface Product {
+export interface Product extends Pack {
   id: string
   family_id: string
   name: string | null
@@ -59,7 +69,7 @@ export interface ShoppingItem {
   deleted_at: string | null
 }
 
-export interface ProductValues {
+export interface ProductValues extends Pack {
   name: string
   emoji: string
   category: Category
@@ -82,6 +92,29 @@ export interface PantryValues {
   min_qty: number
 }
 
+// Receipt scan: one recognized line, what is sent to apply_receipt, and its result.
+export interface ReceiptItem {
+  raw_text: string
+  product_id: string | null // null = no match
+  quantity: number
+  uncertain: boolean // the model is not sure about the match or the quantity
+  pack_size: number | null // printed on the line; only suggested for NEW products
+  pack_unit: PackUnit | null
+}
+
+export interface ReceiptLine {
+  product_id: string | null
+  new_product: ProductValues | null // creates a custom product instead of using product_id
+  quantity: number
+  alias: string | null // receipt text to learn for this product
+}
+
+export interface ReceiptResult {
+  cleared: number // list items fully bought
+  reduced: number // list items partly bought
+  pantry: number // products whose stock was raised
+}
+
 export type PantryStatus = 'untracked' | 'out' | 'low' | 'ok'
 
 // "Running low": a target is set and the stock is at or below the minimum.
@@ -99,4 +132,12 @@ export function pantryStatus(item?: PantryItem): PantryStatus {
 // Starter products take their name from the translation files, custom ones from the database.
 export function productName(product: Product, t: TFunction): string {
   return product.seed_key ? t(`kitchen.products.${product.seed_key}`) : (product.name ?? '')
+}
+
+// Name with the optional package size, e.g. "Zwiebeln · 1 kg" (counts still refer to packs).
+export function productLabel(product: Product, t: TFunction): string {
+  const name = productName(product, t)
+  if (product.pack_size == null || !product.pack_unit) return name
+  const size = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 3 }).format(product.pack_size)
+  return `${name} · ${size} ${t(`kitchen.units.${product.pack_unit}`)}`
 }

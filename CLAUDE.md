@@ -55,6 +55,13 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   only after the user's explicit OK. After every migration show a short summary of the result
   (`npm run db:status`). Never write passwords, tokens or connection strings into the repository or into replies
   (DB password and access token live only in the user's own shell/login, e.g. `SUPABASE_DB_PASSWORD`).
+- Edge Functions live in `supabase/functions/<name>/` and are deployed with `npm run fn:deploy` (only on the user's OK).
+  Secrets (e.g. `ANTHROPIC_API_KEY`) are set in Supabase by the user and never appear in the repo, the frontend or
+  replies. Receipt photos are never stored or logged; the model's output is validated server-side.
+- Products may have an optional package size (`pack_size` + `pack_unit`, stored as g/kg/ml/l/pcs). It is only a label
+  (`productLabel`): Ist, Soll, Min and the shopping list always count PACKS (integers).
+- Receipt scanning (`scan-receipt` + `apply_receipt`): nothing changes before the user confirms; the approval
+  button is locked from the first click until saving ends.
 - Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`
   (one shared definition; has_module_access read/write). Tables with `deleted_at` use soft deletion (with_delete = false).
 - Kitchen module (`kitchen`): tabs shopping, pantry, recipes, meal-plan under `/kitchen/...`; the family `products`

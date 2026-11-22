@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { PackField, parsePack } from './PackField'
 import { CATEGORIES, CATEGORY_ICONS, EMOJI_CHOICES, type ProductValues } from './products'
 
 interface Props {
@@ -14,10 +15,12 @@ export function ProductForm({ initial, onSubmit, onCancel }: Props) {
   const [name, setName] = useState(initial?.name ?? '')
   const [category, setCategory] = useState(initial?.category ?? CATEGORIES[0])
   const [emoji, setEmoji] = useState(initial?.emoji ?? CATEGORY_ICONS[category])
+  const [packSize, setPackSize] = useState(initial?.pack_size != null ? String(initial.pack_size) : '')
+  const [packUnit, setPackUnit] = useState<string>(initial?.pack_unit ?? '')
 
   function submit(e: FormEvent) {
     e.preventDefault()
-    onSubmit({ name: name.trim(), emoji, category })
+    onSubmit({ name: name.trim(), emoji, category, ...parsePack(packSize, packUnit) })
   }
 
   return (
@@ -37,6 +40,7 @@ export function ProductForm({ initial, onSubmit, onCancel }: Props) {
           </option>
         ))}
       </select>
+      <PackField size={packSize} unit={packUnit} onSize={setPackSize} onUnit={setPackUnit} />
       <div className="emoji-grid" role="group" aria-label={t('kitchen.custom.emoji')}>
         {EMOJI_CHOICES.map((e) => (
           <button

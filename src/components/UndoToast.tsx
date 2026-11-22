@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 interface Toast {
   message: string
-  onUndo: () => void
+  onUndo?: () => void // without it the toast is just a message
 }
 
 const VISIBLE_MS = 8000
@@ -18,7 +18,7 @@ export function useUndo() {
     setToast(null)
   }, [])
 
-  const show = useCallback((message: string, onUndo: () => void) => {
+  const show = useCallback((message: string, onUndo?: () => void) => {
     window.clearTimeout(timer.current)
     setToast({ message, onUndo })
     timer.current = window.setTimeout(() => setToast(null), VISIBLE_MS)
@@ -33,15 +33,17 @@ export function UndoToast({ toast, dismiss }: { toast: Toast | null; dismiss: ()
   return (
     <div className="toast" role="status">
       <span>{toast.message}</span>
-      <button
-        className="toast-btn"
-        onClick={() => {
-          toast.onUndo()
-          dismiss()
-        }}
-      >
-        {t('kitchen.shopping.undo')}
-      </button>
+      {toast.onUndo && (
+        <button
+          className="toast-btn"
+          onClick={() => {
+            toast.onUndo?.()
+            dismiss()
+          }}
+        >
+          {t('kitchen.shopping.undo')}
+        </button>
+      )}
     </div>
   )
 }

@@ -109,6 +109,7 @@
     },
     "custom": {
       "title": "Eigene Produkte",
+      "pack": "Packung (optional)",
       "add": "Produkt hinzufügen",
       "edit": "Bearbeiten",
       "name": "Name",
@@ -121,6 +122,31 @@
       "archivedToast": "Archiviert: {{name}}",
       "unarchive": "Wiederherstellen",
       "empty": "Keine eigenen Produkte."
+    },
+    "units": { "g": "g", "kg": "kg", "ml": "ml", "l": "l", "pcs": "Stk" },
+    "receipt": {
+      "scan": "Kassenbon scannen",
+      "scanning": "Kassenbon wird gelesen…",
+      "privacy": "Das Foto wird zum Auslesen gesendet und nicht gespeichert.",
+      "reviewTitle": "Kassenbon prüfen",
+      "unmatched": "Keine Zuordnung",
+      "uncertain": "Unsicher – bitte prüfen",
+      "suggestion": "Vorschlag: {{name}}",
+      "skip": "Überspringen",
+      "newProduct": "Neues Produkt…",
+      "newLabel": "Neues Produkt: {{name}}",
+      "quantity": "Menge",
+      "approve": "Bestätigen",
+      "approving": "Wird gespeichert…",
+      "done": "Kassenbon gespeichert: {{cleared}} von der Liste genommen, {{pantry}} zu den Vorräten hinzugefügt",
+      "errors": {
+        "forbidden": "Keine Berechtigung zum Scannen von Kassenbons.",
+        "limit_reached": "Das Tageslimit für Scans ist erreicht.",
+        "bad_request": "Das Foto konnte nicht gesendet werden.",
+        "scan_failed": "Der Kassenbon konnte nicht gelesen werden. Bitte erneut versuchen.",
+        "image": "Das Foto konnte nicht verarbeitet werden.",
+        "empty": "Auf dem Foto wurden keine Positionen gefunden."
+      }
     },
     "pantry": {
       "filterAll": "Alle",

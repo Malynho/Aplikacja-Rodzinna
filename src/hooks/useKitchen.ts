@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { FunctionsHttpError } from '@supabase/supabase-js'
+import i18n from '../i18n'
 import { supabase } from '../lib/supabase'
 import { STARTER_PRODUCTS } from '../pages/kitchen/starterProducts'
 import {
+  productLabel,
   runningLow,
+  type Pack,
   type PantryItem,
   type PantryValues,
   type Product,
   type ProductValues,
+  type ReceiptItem,
+  type ReceiptLine,
+  type ReceiptResult,
   type ShoppingItem,
 } from '../pages/kitchen/products'
 
@@ -143,8 +150,42 @@ export function useKitchen(familyId: string) {
           .from('pantry_items')
           .upsert({ family_id: familyId, product_id: productId, ...values }, { onConflict: 'family_id,product_id' }),
       ),
+    // Package size of a product (both values, or both null to clear it).
+    setPack: (productId: string, pack: Pack) =>
+      run(supabase.from('products').update(pack).eq('id', productId)),
     // Puts every product with Soll > Ist on the shopping list (no duplicates, set to Soll - Ist).
     addShortages: () => run(supabase.rpc('add_pantry_shortages', { fid: familyId, pid: null })),
+    // Receipt scan: the photo goes to the Edge Function and is not stored. Returns the lines or an error code.
+    scanReceipt: async (imageBase64: string): Promise<{ items: ReceiptItem[] } | { error: string }> => {
+      const pl = i18n.getFixedT('pl')
+      const de = i18n.getFixedT('de')
+      const catalog = [...products.values()]
+        .filter((p) => !p.deleted_at)
+        // names include the package size, so "Zwiebeln · 1 kg" and "Zwiebeln · 2 kg" can be told apart
+        .map((p) => ({ id: p.id, names: p.seed_key ? [productLabel(p, pl), productLabel(p, de)] : [productLabel(p, de)] }))
+      const { data, error: err } = await supabase.functions.invoke('scan-receipt', {
+        body: { family_id: familyId, image_base64: imageBase64, catalog },
+      })
+      if (err) {
+        let code = 'scan_failed'
+        if (err instanceof FunctionsHttpError) {
+          try {
+            code = (await err.context.json()).error ?? code
+          } catch {
+            // keep the generic code
+          }
+        }
+        return { error: ['forbidden', 'limit_reached', 'bad_request'].includes(code) ? code : 'scan_failed' }
+      }
+      return { items: (data?.items ?? []) as ReceiptItem[] }
+    },
+    // Applies a confirmed receipt in one database call. Returns the summary or null on failure.
+    applyReceipt: async (lines: ReceiptLine[]): Promise<ReceiptResult | null> => {
+      const { data, error: err } = await supabase.rpc('apply_receipt', { fid: familyId, lines })
+      setError(err ? 'error' : null)
+      if (!subscribed.current) await load()
+      return err ? null : (data as ReceiptResult)
+    },
     // Adds the starter catalog once; existing (family_id, seed_key) pairs are skipped.
     seed: () =>
       run(
