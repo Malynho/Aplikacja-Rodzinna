@@ -3,12 +3,13 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthProvider'
 import { useFamily } from '../family/FamilyProvider'
+import { useModuleAccess } from '../hooks/useModuleAccess'
 import { Controls } from './Controls'
 
 // Sidebar entries: route path + translation key.
 export const NAV_ITEMS = [
   { to: '/', key: 'home' },
-  { to: '/shopping', key: 'shopping' },
+  { to: '/kitchen', key: 'kitchen' },
   { to: '/todo', key: 'todo' },
   { to: '/notes', key: 'notes' },
   { to: '/admin', key: 'admin' },
@@ -19,10 +20,13 @@ export function Layout() {
   const { signOut } = useAuth()
   const { family, role, loading } = useFamily()
   const [open, setOpen] = useState(false) // mobile drawer state
-  // Verwaltung is shown to admins, and to users who have no family yet (to create one).
-  const items = NAV_ITEMS.filter(
-    (i) => i.key !== 'admin' || (!loading && (!family || role === 'admin')),
-  )
+  const kitchenAccess = useModuleAccess('kitchen')
+  // Verwaltung: admins and users without a family yet (to create one). Kitchen: read or write access.
+  const items = NAV_ITEMS.filter((i) => {
+    if (i.key === 'admin') return !loading && (!family || role === 'admin')
+    if (i.key === 'kitchen') return !loading && kitchenAccess !== 'none'
+    return true
+  })
 
   return (
     <div className="layout">

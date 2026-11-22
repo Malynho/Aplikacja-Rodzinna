@@ -194,14 +194,19 @@ button {
   padding: 3px;
 }
 
-.segmented button {
+.segmented button,
+.segmented a {
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.segmented button.active {
+.segmented button.active,
+.segmented a.active {
   background: var(--accent);
   color: var(--on-accent);
 }
@@ -283,6 +288,184 @@ h3 {
 .table th {
   color: var(--text-muted);
   font-weight: 600;
+}
+
+/* Kitchen: tabs, product tiles, shopping list, undo toast */
+.tabs,
+.view-switch {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.search {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.tile {
+  position: relative;
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.tile.selected {
+  outline: 2px solid var(--accent);
+}
+
+.tile-main {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 6px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.tile-main:disabled {
+  cursor: default;
+}
+
+.tile-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.tile-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.tile-qty {
+  display: flex;
+}
+
+.tile-qty button {
+  flex: 1;
+  min-height: 44px;
+  background: var(--track);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.list-row.card {
+  padding: 8px 16px;
+}
+
+.list-row.done .grow {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.list-emoji {
+  margin-right: 8px;
+}
+
+.check {
+  width: 24px;
+  height: 24px;
+  margin: 10px;
+  accent-color: var(--accent);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+}
+
+.qty {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emoji-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--track);
+  font-size: 1.4rem;
+}
+
+.emoji-btn.active {
+  outline: 2px solid var(--accent);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 8px 8px 8px 20px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+}
+
+.toast-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  font-weight: 800;
+  color: var(--accent);
 }
 
 /* Login */

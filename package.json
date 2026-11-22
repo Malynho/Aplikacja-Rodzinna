@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:status": "supabase migration list --remote",
+    "db:dry": "supabase db push --dry-run --remote",
+    "db:push": "supabase db push --remote"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",
@@ -20,6 +23,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "supabase": "^3.2.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8"
   }

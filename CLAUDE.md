@@ -46,3 +46,16 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   Invitations are created and accepted only through the `security definer` functions.
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
+  Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping. Next: 0008.
+- Applying migrations (Supabase CLI 3.x targets the local stack by default, so the scripts always pass `--remote`
+  for the linked project): new migrations are checked with `npm run db:dry` and applied with `npm run db:push`
+  only after the user's explicit OK. After every migration show a short summary of the result
+  (`npm run db:status`). Never write passwords, tokens or connection strings into the repository or into replies
+  (DB password and access token live only in the user's own shell/login, e.g. `SUPABASE_DB_PASSWORD`).
+- Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`
+  (one shared definition; has_module_access read/write). Tables with `deleted_at` use soft deletion (with_delete = false).
+- Kitchen module (`kitchen`): tabs shopping, pantry, recipes, meal-plan under `/kitchen/...`; the family `products`
+  catalog is shared by all tabs. Starter product names come from `kitchen.products.<seed_key>` in the translation files.
+- Live data uses Supabase Realtime: actions only write to the database, the UI updates from the change event
+  (see `useShopping`).
