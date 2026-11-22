@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useAuth } from '../auth/AuthProvider'
+import { supabase } from '../lib/supabase'
 
 export type Theme = 'light' | 'dark' | 'system'
 export const THEMES: Theme[] = ['light', 'dark', 'system']
@@ -18,12 +20,32 @@ function apply(theme: Theme) {
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(readStored)
+  const { user } = useAuth()
+  const [theme, setThemeState] = useState<Theme>(readStored)
 
   useEffect(() => {
     apply(theme)
     localStorage.setItem(STORAGE_KEY, theme)
   }, [theme])
+
+  // Signed-in users get their saved theme from the profile (null = nothing saved yet).
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('profiles')
+      .select('theme')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data && THEMES.includes(data.theme as Theme)) setThemeState(data.theme as Theme)
+      })
+  }, [user])
+
+  // Changing the theme also saves it to the profile so it follows the user across devices.
+  function setTheme(next: Theme) {
+    setThemeState(next)
+    if (user) supabase.from('profiles').update({ theme: next }).eq('id', user.id).then()
+  }
 
   return { theme, setTheme }
 }

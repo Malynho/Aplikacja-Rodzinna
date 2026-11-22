@@ -19,10 +19,10 @@ export function Dashboard() {
   return (
     <>
       <h1>{t('greeting', { name: firstName })}</h1>
-      <div className="card info">
-        <div>{dateText}</div>
-        <div className="muted">{t('week', { number: isoWeek(now) })}</div>
-        <div className="weather">
+      <div className="pills">
+        <span className="pill">{dateText}</span>
+        <span className="pill">{t('week', { number: isoWeek(now) })}</span>
+        <span className="pill">
           {weather ? (
             <>
               <span className="weather-icon">{weather.icon}</span>
@@ -32,7 +32,7 @@ export function Dashboard() {
           ) : (
             <span className="muted">{t(error ? 'weather.error' : 'weather.loading')}</span>
           )}
-        </div>
+        </span>
       </div>
     </>
   )
