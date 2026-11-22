@@ -65,6 +65,37 @@ export interface ProductValues {
   category: Category
 }
 
+// Pantry stock of a product: ist = have, soll = target, min_qty = "running low" marker.
+export interface PantryItem {
+  id: string
+  family_id: string
+  product_id: string
+  ist: number
+  soll: number
+  min_qty: number
+  updated_at: string
+}
+
+export interface PantryValues {
+  ist: number
+  soll: number
+  min_qty: number
+}
+
+export type PantryStatus = 'untracked' | 'out' | 'low' | 'ok'
+
+// "Running low": a target is set and the stock is at or below the minimum.
+export function runningLow(item?: PantryItem): boolean {
+  return !!item && item.soll > 0 && item.ist <= item.min_qty
+}
+
+// Products with neither stock nor target are not tracked and stay neutral.
+export function pantryStatus(item?: PantryItem): PantryStatus {
+  if (!item || (item.ist === 0 && item.soll === 0)) return 'untracked'
+  if (item.ist === 0) return 'out'
+  return runningLow(item) ? 'low' : 'ok'
+}
+
 // Starter products take their name from the translation files, custom ones from the database.
 export function productName(product: Product, t: TFunction): string {
   return product.seed_key ? t(`kitchen.products.${product.seed_key}`) : (product.name ?? '')

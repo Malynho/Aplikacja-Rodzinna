@@ -47,7 +47,9 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
   Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
-  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping. Next: 0008.
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry. Next: 0009.
+  Pantry triggers: bought shopping item (checked false->true) raises `ist`; a falling `ist` sets the open shopping
+  item to `soll - ist` (`add_pantry_shortages`). Neither trigger touches the column that fires the other (no loop).
 - Applying migrations (Supabase CLI 3.x targets the local stack by default, so the scripts always pass `--remote`
   for the linked project): new migrations are checked with `npm run db:dry` and applied with `npm run db:push`
   only after the user's explicit OK. After every migration show a short summary of the result
@@ -58,4 +60,4 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
 - Kitchen module (`kitchen`): tabs shopping, pantry, recipes, meal-plan under `/kitchen/...`; the family `products`
   catalog is shared by all tabs. Starter product names come from `kitchen.products.<seed_key>` in the translation files.
 - Live data uses Supabase Realtime: actions only write to the database, the UI updates from the change event
-  (see `useShopping`).
+  (see `useKitchen`, loaded once in `Kitchen.tsx` and passed to the tabs via the Outlet context).

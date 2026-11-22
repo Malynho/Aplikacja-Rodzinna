@@ -122,6 +122,19 @@
       "unarchive": "Przywróć",
       "empty": "Brak własnych produktów."
     },
+    "pantry": {
+      "filterAll": "Wszystko",
+      "filterLow": "Kończy się ({{count}})",
+      "lowInCategory": "{{count}} kończy się",
+      "addShortages": "Dodaj braki do listy ({{count}})",
+      "ofSoll": "{{ist}} z {{soll}}",
+      "ist": "Mam",
+      "soll": "Docelowo",
+      "min": "Minimum",
+      "usedAmount": "Ile zużyłeś?",
+      "usedButton": "Zużyłem",
+      "status": { "out": "Brak", "low": "Kończy się", "ok": "OK" }
+    },
     "products": {
       "apple": "Jabłka",
       "pear": "Gruszki",

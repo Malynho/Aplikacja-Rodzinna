@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { supabase } from '../lib/supabase'
 import { STARTER_PRODUCTS } from '../pages/kitchen/starterProducts'
-import type { Product, ProductValues, ShoppingItem } from '../pages/kitchen/products'
+import {
+  runningLow,
+  type PantryItem,
+  type PantryValues,
+  type Product,
+  type ProductValues,
+  type ShoppingItem,
+} from '../pages/kitchen/products'
 
 const RECENT_LIMIT = 10
 
@@ -22,18 +29,20 @@ function applyChange<T extends Row>(set: Dispatch<SetStateAction<Map<string, T>>
   }
 }
 
-// Products and shopping list of one family, kept live via Supabase Realtime.
+// Products, shopping list and pantry of one family, kept live via Supabase Realtime.
 // Actions only write to the database; the UI updates from the Realtime event (no double writes).
-export function useShopping(familyId: string) {
+export function useKitchen(familyId: string) {
   const [products, setProducts] = useState<Map<string, Product>>(new Map())
   const [items, setItems] = useState<Map<string, ShoppingItem>>(new Map())
+  const [pantry, setPantry] = useState<Map<string, PantryItem>>(new Map())
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState<ErrorKey | null>(null)
   const subscribed = useRef(false)
 
   const load = useCallback(async () => {
-    const [p, open, deleted] = await Promise.all([
+    const [p, pan, open, deleted] = await Promise.all([
       supabase.from('products').select('*').eq('family_id', familyId),
+      supabase.from('pantry_items').select('*').eq('family_id', familyId),
       supabase.from('shopping_items').select('*').eq('family_id', familyId).is('deleted_at', null),
       supabase
         .from('shopping_items')
@@ -45,6 +54,7 @@ export function useShopping(familyId: string) {
         .limit(RECENT_LIMIT),
     ])
     setProducts(new Map((p.data ?? []).map((r: Product) => [r.id, r])))
+    setPantry(new Map((pan.data ?? []).map((r: PantryItem) => [r.id, r])))
     setItems(new Map([...(open.data ?? []), ...(deleted.data ?? [])].map((r: ShoppingItem) => [r.id, r])))
     setLoaded(true)
   }, [familyId])
@@ -55,6 +65,7 @@ export function useShopping(familyId: string) {
       .channel(`kitchen:${familyId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products', filter }, applyChange(setProducts))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_items', filter }, applyChange(setItems))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pantry_items', filter }, applyChange(setPantry))
       .subscribe((status) => {
         subscribed.current = status === 'SUBSCRIBED'
         // Load after subscribing so no change is missed; also (re)load when the connection fails or returns.
@@ -75,10 +86,14 @@ export function useShopping(familyId: string) {
 
   const view = useMemo(() => {
     const all = [...products.values()]
+    const active = all.filter((p) => !p.deleted_at)
+    const byProduct = new Map([...pantry.values()].map((r) => [r.product_id, r]))
     const allItems = [...items.values()]
     const openItems = allItems.filter((i) => !i.deleted_at)
     return {
-      products: all.filter((p) => !p.deleted_at),
+      products: active,
+      pantryByProduct: byProduct,
+      lowCount: active.filter((p) => runningLow(byProduct.get(p.id))).length,
       archived: all.filter((p) => p.deleted_at),
       items: openItems,
       recent: allItems
@@ -87,7 +102,7 @@ export function useShopping(familyId: string) {
         .slice(0, RECENT_LIMIT),
       quantities: new Map(openItems.filter((i) => !i.checked).map((i) => [i.product_id, i.quantity])),
     }
-  }, [products, items])
+  }, [products, items, pantry])
 
   const hasSeeded = useMemo(() => [...products.values()].some((p) => p.seed_key), [products])
 
@@ -119,6 +134,17 @@ export function useShopping(familyId: string) {
       run(supabase.from('products').insert({ family_id: familyId, ...values })),
     updateProduct: (id: string, values: ProductValues) =>
       run(supabase.from('products').update(values).eq('id', id)),
+    // Pantry: +/- on Ist (atomic, never below 0). A falling Ist adds the shortage to the shopping list (DB trigger).
+    changeIst: (productId: string, delta: number) =>
+      run(supabase.rpc('change_pantry_ist', { fid: familyId, pid: productId, delta })),
+    savePantry: (productId: string, values: PantryValues) =>
+      run(
+        supabase
+          .from('pantry_items')
+          .upsert({ family_id: familyId, product_id: productId, ...values }, { onConflict: 'family_id,product_id' }),
+      ),
+    // Puts every product with Soll > Ist on the shopping list (no duplicates, set to Soll - Ist).
+    addShortages: () => run(supabase.rpc('add_pantry_shortages', { fid: familyId, pid: null })),
     // Adds the starter catalog once; existing (family_id, seed_key) pairs are skipped.
     seed: () =>
       run(
@@ -134,3 +160,6 @@ export function useShopping(familyId: string) {
       ),
   }
 }
+
+// Shape of the data shared with the Kitchen tabs through the router outlet context.
+export type KitchenData = ReturnType<typeof useKitchen>

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useFamily } from '../../family/FamilyProvider'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
-import { useShopping } from '../../hooks/useShopping'
+import type { KitchenData } from '../../hooks/useKitchen'
 import { UndoToast, useUndo } from '../../components/UndoToast'
 import { OwnProducts } from './OwnProducts'
 import { ProductGrid } from './ProductGrid'
@@ -13,29 +13,11 @@ const VIEWS = ['products', 'list', 'own'] as const
 type View = (typeof VIEWS)[number]
 
 export function Shopping() {
-  const { family } = useFamily()
-  const canWrite = useModuleAccess('kitchen') === 'write'
-  if (!family) return null
-  return <ShoppingBody familyId={family.id} canWrite={canWrite} />
-}
-
-function ShoppingBody({ familyId, canWrite }: { familyId: string; canWrite: boolean }) {
   const { t } = useTranslation()
-  const shop = useShopping(familyId)
+  const shop = useOutletContext<KitchenData>()
+  const canWrite = useModuleAccess('kitchen') === 'write'
   const undo = useUndo()
   const [view, setView] = useState<View>('products')
-  const seeding = useRef(false)
-
-  // First visit by someone who may write: add the starter catalog (duplicates are skipped by the database).
-  const { loaded, hasSeeded, seed } = shop
-  useEffect(() => {
-    if (canWrite && loaded && !hasSeeded && !seeding.current) {
-      seeding.current = true
-      seed()
-    }
-    // seed only depends on familyId, which is fixed for this component
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canWrite, loaded, hasSeeded])
 
   const nameOf = (productId: string) => {
     const p = shop.productById.get(productId)
@@ -94,6 +76,7 @@ function ShoppingBody({ familyId, canWrite }: { familyId: string; canWrite: bool
           quantities={shop.quantities}
           canWrite={canWrite}
           onChange={shop.changeQuantity}
+          storageKey="kitchen:open:shopping"
         />
       )}
       {view === 'list' && (

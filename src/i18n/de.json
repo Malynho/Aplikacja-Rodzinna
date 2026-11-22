@@ -122,6 +122,19 @@
       "unarchive": "Wiederherstellen",
       "empty": "Keine eigenen Produkte."
     },
+    "pantry": {
+      "filterAll": "Alle",
+      "filterLow": "Wird knapp ({{count}})",
+      "lowInCategory": "{{count}} wird knapp",
+      "addShortages": "Fehlendes zur Liste hinzufügen ({{count}})",
+      "ofSoll": "{{ist}} von {{soll}}",
+      "ist": "Ist",
+      "soll": "Soll",
+      "min": "Min",
+      "usedAmount": "Wie viel verbraucht?",
+      "usedButton": "Verbraucht",
+      "status": { "out": "Leer", "low": "Wird knapp", "ok": "OK" }
+    },
     "products": {
       "apple": "Äpfel",
       "pear": "Birnen",

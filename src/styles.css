@@ -9,6 +9,7 @@
   --accent: #2f5e48;
   --on-accent: #ffffff;
   --danger: #a3392d;
+  --warning: #8f5a00;
   --overlay: rgba(33, 42, 37, 0.4);
   --shadow: 0 2px 14px rgba(33, 42, 37, 0.06);
   --person-1-bg: #f5d9cc;
@@ -33,6 +34,7 @@
     --accent: #f0b25e;
     --on-accent: #1f1d1b;
     --danger: #f08a7e;
+    --warning: #ff9a52;
     --overlay: rgba(0, 0, 0, 0.6);
     --shadow: none;
     --person-1-bg: #4a3a31;
@@ -55,6 +57,7 @@
   --accent: #f0b25e;
   --on-accent: #1f1d1b;
   --danger: #f08a7e;
+  --warning: #ff9a52;
   --overlay: rgba(0, 0, 0, 0.6);
   --shadow: none;
   --person-1-bg: #4a3a31;
@@ -320,6 +323,70 @@ h3 {
 
 .tile.selected {
   outline: 2px solid var(--accent);
+}
+
+/* Pantry status: empty = dashed red, running low = orange; OK stays calm. Not color-only (dashed vs solid). */
+.tile.status-out {
+  outline: 2px dashed var(--danger);
+}
+
+.tile.status-low {
+  outline: 2px solid var(--warning);
+}
+
+.tile.status-out .badge {
+  background: var(--danger);
+  color: var(--on-accent);
+}
+
+.tile.status-low .badge {
+  background: var(--warning);
+  color: var(--on-accent);
+}
+
+.tile.status-ok .badge {
+  background: var(--track);
+  color: var(--text);
+}
+
+.toolbar {
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* Collapsible category header (a button inside the h3). */
+.category-head {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  font-weight: 800;
+}
+
+.chevron {
+  display: inline-block;
+  width: 16px;
+  transition: transform 0.15s;
+}
+
+.category-head[aria-expanded='true'] .chevron {
+  transform: rotate(90deg);
+}
+
+.category-low {
+  margin-left: auto;
+  color: var(--warning);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .tile-main {

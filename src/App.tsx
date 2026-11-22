@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { KITCHEN_TABS, Kitchen } from './pages/kitchen/Kitchen'
+import { Pantry } from './pages/kitchen/Pantry'
 import { Shopping } from './pages/kitchen/Shopping'
 import { AuthProvider } from './auth/AuthProvider'
 import { FamilyProvider } from './family/FamilyProvider'
@@ -26,7 +27,8 @@ export default function App() {
                 <Route path="/kitchen" element={<Kitchen />}>
                   <Route index element={<Navigate to="shopping" replace />} />
                   <Route path="shopping" element={<Shopping />} />
-                  {KITCHEN_TABS.filter((tab) => tab.to !== 'shopping').map(({ to, key }) => (
+                  <Route path="pantry" element={<Pantry />} />
+                  {KITCHEN_TABS.filter((tab) => !['shopping', 'pantry'].includes(tab.to)).map(({ to, key }) => (
                     <Route key={to} path={to} element={<ModulePage titleKey={`kitchen.tabs.${key}`} />} />
                   ))}
                 </Route>
