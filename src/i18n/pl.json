@@ -12,10 +12,50 @@
     "shopping": "Einkaufsliste",
     "todo": "To-do",
     "notes": "Notizen",
+    "kitchen": "Kuchnia",
     "admin": "Verwaltung",
     "menu": "Menu"
   },
   "module": { "comingSoon": "Ten moduł pojawi się wkrótce." },
+  "admin": {
+    "createFamily": {
+      "title": "Utwórz rodzinę",
+      "name": "Nazwa rodziny",
+      "submit": "Utwórz",
+      "needInvite": "Poproś o zaproszenie.",
+      "error": "Nie udało się utworzyć rodziny. Spróbuj ponownie."
+    },
+    "invitations": {
+      "title": "Zaproszenia",
+      "create": "Utwórz link zaproszenia",
+      "forWhom": "Dla kogo (opcjonalnie)",
+      "linkHint": "Link jest ważny 7 dni i działa tylko raz. Zniknie po kliknięciu „Gotowe”, odświeżeniu lub zamknięciu strony – w bazie jest zapisany tylko jego skrót, więc nie da się go odzyskać.",
+      "copy": "Kopiuj",
+      "copied": "Skopiowano",
+      "share": "Udostępnij",
+      "shareText": "Zaproszenie do aplikacji rodzinnej",
+      "done": "Gotowe",
+      "pending": "Oczekujące zaproszenia",
+      "none": "Brak oczekujących zaproszeń",
+      "expires": "Wygasa {{date}}",
+      "revoke": "Unieważnij"
+    },
+    "members": {
+      "title": "Członkowie i uprawnienia",
+      "person": "Osoba",
+      "role": "Rola",
+      "fullAccess": "Pełny dostęp",
+      "remove": "Usuń",
+      "confirmRemove": "Usunąć {{name}} z rodziny?"
+    },
+    "role": { "admin": "Administrator", "member": "Członek" },
+    "access": { "none": "Brak", "read": "Odczyt", "write": "Zapis" },
+    "saveError": "Nie udało się zapisać zmian."
+  },
+  "invite": {
+    "error": "Zaproszenie jest nieprawidłowe, wygasło lub zostało już użyte.",
+    "back": "Wróć na start"
+  },
   "theme": { "light": "Jasny", "dark": "Ciemny", "system": "Systemowy" },
   "weather": {
     "loading": "Ładowanie pogody…",

@@ -38,4 +38,11 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
 - All UI text lives in `src/i18n/pl.json` and `src/i18n/de.json` (keep both in sync); no hardcoded UI strings.
 - Every table has RLS enabled. Module tables are added in their own migration together with the module,
   and use `has_module_access(family_id, '<module>', 'read' | 'write')` in policies.
-- UI shows only the user's first family for now; the schema supports many.
+- UI shows only the user's first family for now; the schema supports many (`useFamily`).
+- Permission modules: `kitchen`, `todo`, `notes`. Verwaltung is admin-only and has no permission rows.
+- Only the first user can create a family; everyone else joins through an invitation.
+- Invitations: only the token hash is stored, the link carries the token in the URL fragment
+  (`/invite#<token>`), it is removed from the URL immediately and from session storage after use.
+  Invitations are created and accepted only through the `security definer` functions.
+  A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
+- Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.

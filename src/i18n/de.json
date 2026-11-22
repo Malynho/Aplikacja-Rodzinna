@@ -12,10 +12,50 @@
     "shopping": "Einkaufsliste",
     "todo": "To-do",
     "notes": "Notizen",
+    "kitchen": "Küche",
     "admin": "Verwaltung",
     "menu": "Menü"
   },
   "module": { "comingSoon": "Dieses Modul folgt bald." },
+  "admin": {
+    "createFamily": {
+      "title": "Familie erstellen",
+      "name": "Name der Familie",
+      "submit": "Erstellen",
+      "needInvite": "Bitte um eine Einladung.",
+      "error": "Die Familie konnte nicht erstellt werden. Bitte erneut versuchen."
+    },
+    "invitations": {
+      "title": "Einladungen",
+      "create": "Einladungslink erstellen",
+      "forWhom": "Für wen (optional)",
+      "linkHint": "Der Link ist 7 Tage gültig und funktioniert nur einmal. Er verschwindet nach „Fertig“, beim Neuladen oder Schließen der Seite – gespeichert ist nur sein Hash, er lässt sich nicht wiederherstellen.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "share": "Teilen",
+      "shareText": "Einladung zur Familien-App",
+      "done": "Fertig",
+      "pending": "Offene Einladungen",
+      "none": "Keine offenen Einladungen",
+      "expires": "Läuft ab am {{date}}",
+      "revoke": "Widerrufen"
+    },
+    "members": {
+      "title": "Mitglieder und Berechtigungen",
+      "person": "Person",
+      "role": "Rolle",
+      "fullAccess": "Voller Zugriff",
+      "remove": "Entfernen",
+      "confirmRemove": "{{name}} aus der Familie entfernen?"
+    },
+    "role": { "admin": "Administrator", "member": "Mitglied" },
+    "access": { "none": "Kein", "read": "Lesen", "write": "Schreiben" },
+    "saveError": "Änderungen konnten nicht gespeichert werden."
+  },
+  "invite": {
+    "error": "Die Einladung ist ungültig, abgelaufen oder wurde bereits verwendet.",
+    "back": "Zur Startseite"
+  },
   "theme": { "light": "Hell", "dark": "Dunkel", "system": "System" },
   "weather": {
     "loading": "Wetter wird geladen…",
