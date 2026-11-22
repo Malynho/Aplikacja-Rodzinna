@@ -1,6 +1,6 @@
 # Aplikacja Rodzinna
 
-Family web app used from a browser on multiple devices, deployed to Cloudflare Pages.
+Family web app used from a browser on multiple devices, deployed to Cloudflare (Workers static assets).
 
 ## Stack
 
@@ -21,10 +21,10 @@ src/i18n/        index.ts, pl.json, de.json
 src/lib/         supabase client, small helpers
 src/pages/       one file per page/module
 supabase/migrations/  numbered SQL migrations (0001_init.sql, ...)
-public/_redirects     SPA fallback for Cloudflare Pages
+wrangler.jsonc     Cloudflare Workers static assets config (SPA routing)
 ```
 
-Cloudflare Pages: build command `npm run build`, output directory `dist`.
+Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run build`, assets in `dist`.
 
 ## Rules
 
