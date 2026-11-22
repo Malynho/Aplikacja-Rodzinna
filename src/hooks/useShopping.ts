@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { STARTER_PRODUCTS } from '../pages/kitchen/starterProducts'
 import type { Product, ProductValues, ShoppingItem } from '../pages/kitchen/products'
 
-const RECENT_LIMIT = 20
+const RECENT_LIMIT = 10
 
 type Row = { id: string; updated_at: string }
 type ErrorKey = 'alreadyOnList' | 'error'
@@ -40,6 +40,7 @@ export function useShopping(familyId: string) {
         .select('*')
         .eq('family_id', familyId)
         .not('deleted_at', 'is', null)
+        .eq('checked', false) // only manually removed items; bought ones are deleted + checked
         .order('deleted_at', { ascending: false })
         .limit(RECENT_LIMIT),
     ])
@@ -81,7 +82,7 @@ export function useShopping(familyId: string) {
       archived: all.filter((p) => p.deleted_at),
       items: openItems,
       recent: allItems
-        .filter((i) => i.deleted_at)
+        .filter((i) => i.deleted_at && !i.checked)
         .sort((a, b) => b.deleted_at!.localeCompare(a.deleted_at!))
         .slice(0, RECENT_LIMIT),
       quantities: new Map(openItems.filter((i) => !i.checked).map((i) => [i.product_id, i.quantity])),
@@ -98,8 +99,14 @@ export function useShopping(familyId: string) {
     error,
     changeQuantity: (productId: string, delta: number) =>
       run(supabase.rpc('change_shopping_quantity', { fid: familyId, pid: productId, delta })),
+    // Bought = checked and soft-deleted in one update; undoing reverses both.
     setChecked: (id: string, checked: boolean) =>
-      run(supabase.from('shopping_items').update({ checked }).eq('id', id)),
+      run(
+        supabase
+          .from('shopping_items')
+          .update({ checked, deleted_at: checked ? new Date().toISOString() : null })
+          .eq('id', id),
+      ),
     // Soft delete / restore for both tables (deleted_at = null means active).
     setDeleted: (table: 'shopping_items' | 'products', ids: string[], deleted: boolean) =>
       run(

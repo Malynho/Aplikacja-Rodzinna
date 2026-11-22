@@ -1,30 +1,51 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CATEGORIES, productName, type Product, type ShoppingItem } from './products'
+
+const LEAVE_MS = 250 // fade-out time before a ticked item is written as bought
 
 interface Props {
   items: ShoppingItem[]
   recent: ShoppingItem[]
   products: Map<string, Product>
   canWrite: boolean
-  onChecked: (item: ShoppingItem, checked: boolean) => void
+  onChecked: (item: ShoppingItem, checked: boolean) => Promise<boolean>
   onQuantity: (item: ShoppingItem, delta: number) => void
   onRemove: (item: ShoppingItem) => void
-  onClearBought: () => void
   onRestore: (item: ShoppingItem) => void
 }
 
-export function ShoppingList({
-  items,
-  recent,
-  products,
-  canWrite,
-  onChecked,
-  onQuantity,
-  onRemove,
-  onClearBought,
-  onRestore,
-}: Props) {
+export function ShoppingList({ items, recent, products, canWrite, onChecked, onQuantity, onRemove, onRestore }: Props) {
   const { t, i18n } = useTranslation()
+  const [leaving, setLeaving] = useState<Set<string>>(new Set())
+  const [showRecent, setShowRecent] = useState(false)
+
+  // Forget ids of items that are gone, so an undone item shows up normally again.
+  useEffect(() => {
+    setLeaving((prev) => {
+      const ids = new Set(items.map((i) => i.id))
+      const next = new Set([...prev].filter((id) => ids.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [items])
+
+  async function check(item: ShoppingItem, checked: boolean) {
+    if (!checked) {
+      onChecked(item, false)
+      return
+    }
+    setLeaving((prev) => new Set(prev).add(item.id))
+    await new Promise((resolve) => setTimeout(resolve, LEAVE_MS))
+    const ok = await onChecked(item, true)
+    // Write failed: show the row again.
+    if (!ok) {
+      setLeaving((prev) => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
+    }
+  }
 
   const info = (item: ShoppingItem) => {
     const p = products.get(item.product_id)
@@ -39,20 +60,19 @@ export function ShoppingList({
     const y = info(b)
     return x.order - y.order || x.name.localeCompare(y.name, i18n.language)
   })
-  const toBuy = sorted.filter((i) => !i.checked)
-  const bought = sorted.filter((i) => i.checked)
-  const openProducts = new Set(toBuy.map((i) => i.product_id))
+  // Products that already have an open row: restoring another one would duplicate it.
+  const openProducts = new Set(sorted.filter((i) => !i.checked).map((i) => i.product_id))
 
   const row = (item: ShoppingItem) => {
     const { emoji, name } = info(item)
     return (
-      <div key={item.id} className={`list-row ${item.checked ? 'done' : ''}`}>
+      <div key={item.id} className={`list-row ${item.checked ? 'done' : ''} ${leaving.has(item.id) ? 'leaving' : ''}`}>
         <input
           type="checkbox"
           className="check"
           checked={item.checked}
           disabled={!canWrite}
-          onChange={(e) => onChecked(item, e.target.checked)}
+          onChange={(e) => check(item, e.target.checked)}
         />
         <span className="grow">
           <span className="list-emoji">{emoji}</span>
@@ -83,48 +103,38 @@ export function ShoppingList({
   return (
     <>
       {items.length === 0 && <p className="muted">{t('kitchen.shopping.listEmpty')}</p>}
-      {toBuy.length > 0 && (
+      {sorted.length > 0 && (
         <section className="section">
           <h3>{t('kitchen.shopping.toBuy')}</h3>
-          <div className="card list">{toBuy.map(row)}</div>
-        </section>
-      )}
-      {bought.length > 0 && (
-        <section className="section">
-          <div className="row">
-            <h3 className="grow">{t('kitchen.shopping.bought')}</h3>
-            {canWrite && (
-              <button className="link-btn" onClick={onClearBought}>
-                {t('kitchen.shopping.clearBought')}
-              </button>
-            )}
-          </div>
-          <div className="card list">{bought.map(row)}</div>
+          <div className="card list">{sorted.map(row)}</div>
         </section>
       )}
       {recent.length > 0 && (
         <section className="section">
-          <h3>{t('kitchen.shopping.recentlyDeleted')}</h3>
-          <div className="card list">
-            {recent.map((item) => {
-              const { emoji, name } = info(item)
-              // An open row for the same product exists: restoring would duplicate it.
-              const blocked = !item.checked && openProducts.has(item.product_id)
-              return (
-                <div key={item.id} className="list-row">
-                  <span className="grow muted">
-                    <span className="list-emoji">{emoji}</span>
-                    {name} ×{item.quantity}
-                  </span>
-                  {canWrite && !blocked && (
-                    <button className="link-btn" onClick={() => onRestore(item)}>
-                      {t('kitchen.shopping.restore')}
-                    </button>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+          <button className="link-btn" aria-expanded={showRecent} onClick={() => setShowRecent((s) => !s)}>
+            {t('kitchen.shopping.recentlyDeleted', { count: recent.length })}
+          </button>
+          {showRecent && (
+            <div className="card list">
+              {recent.map((item) => {
+                const { emoji, name } = info(item)
+                const blocked = openProducts.has(item.product_id)
+                return (
+                  <div key={item.id} className="list-row">
+                    <span className="grow muted">
+                      <span className="list-emoji">{emoji}</span>
+                      {name} ×{item.quantity}
+                    </span>
+                    {canWrite && !blocked && (
+                      <button className="link-btn" onClick={() => onRestore(item)}>
+                        {t('kitchen.shopping.restore')}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </section>
       )}
     </>

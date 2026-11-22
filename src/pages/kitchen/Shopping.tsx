@@ -55,13 +55,15 @@ function ShoppingBody({ familyId, canWrite }: { familyId: string; canWrite: bool
     else shop.changeQuantity(item.product_id, delta)
   }
 
-  function clearBought() {
-    const ids = shop.items.filter((i) => i.checked).map((i) => i.id)
-    if (ids.length === 0) return
-    shop.setDeleted('shopping_items', ids, true)
-    undo.show(t('kitchen.shopping.boughtCleared', { count: ids.length }), () =>
-      shop.setDeleted('shopping_items', ids, false),
-    )
+  // Ticking an item marks it bought (it leaves the list); unticking restores it.
+  async function check(item: ShoppingItem, checked: boolean) {
+    const ok = await shop.setChecked(item.id, checked)
+    if (ok && checked) {
+      undo.show(t('kitchen.shopping.boughtToast', { name: nameOf(item.product_id) }), () =>
+        shop.setChecked(item.id, false),
+      )
+    }
+    return ok
   }
 
   function archive(product: Product) {
@@ -100,10 +102,9 @@ function ShoppingBody({ familyId, canWrite }: { familyId: string; canWrite: bool
           recent={shop.recent}
           products={shop.productById}
           canWrite={canWrite}
-          onChecked={(item, checked) => shop.setChecked(item.id, checked)}
+          onChecked={check}
           onQuantity={changeItem}
           onRemove={removeItem}
-          onClearBought={clearBought}
           onRestore={(item) => shop.setDeleted('shopping_items', [item.id], false)}
         />
       )}

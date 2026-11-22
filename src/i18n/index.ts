@@ -17,9 +17,10 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false }, // React already escapes
 })
 
-// Keep <html lang> and localStorage in sync with the active language.
+// Keep <html lang>, the page title and localStorage in sync with the active language.
 i18n.on('languageChanged', (lng) => {
   document.documentElement.lang = lng
+  document.title = i18n.t('app.name')
   localStorage.setItem(STORAGE_KEY, lng)
 })
 document.documentElement.lang = initial

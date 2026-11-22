@@ -386,6 +386,15 @@ h3 {
   align-items: center;
   gap: 8px;
   min-height: 44px;
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+}
+
+/* A just-ticked item fades out before it disappears from the list. */
+.list-row.leaving {
+  opacity: 0;
+  transform: translateX(12px);
 }
 
 .list-row.card {

@@ -10,9 +10,9 @@
   "nav": {
     "home": "Start",
     "todo": "To-do",
-    "notes": "Notizen",
+    "notes": "Notatki",
     "kitchen": "Kuchnia",
-    "admin": "Verwaltung",
+    "admin": "Administracja",
     "menu": "Menu"
   },
   "module": { "comingSoon": "Ten moduł pojawi się wkrótce." },
@@ -97,14 +97,12 @@
       "increase": "Jedna więcej",
       "decrease": "Jedna mniej",
       "toBuy": "Do kupienia",
-      "bought": "Kupione",
       "listEmpty": "Lista zakupów jest pusta.",
-      "clearBought": "Usuń kupione",
       "remove": "Usuń",
       "removed": "Usunięto: {{name}}",
-      "boughtCleared": "Usunięto kupione ({{count}})",
+      "boughtToast": "Kupiono: {{name}}",
       "undo": "Cofnij",
-      "recentlyDeleted": "Ostatnio usunięte",
+      "recentlyDeleted": "Ostatnio usunięte ({{count}})",
       "restore": "Przywróć",
       "alreadyOnList": "Ten produkt jest już na liście.",
       "error": "Nie udało się zapisać zmiany."
