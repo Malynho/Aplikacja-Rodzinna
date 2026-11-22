@@ -66,7 +66,10 @@ export function RecipeForm({ recipe, ingredients, products, productById, onSave,
   }
   const servingsNum = Math.floor(Number(servings))
   const valid =
-    title.trim() !== '' && servingsNum >= 1 && servingsNum <= 100 && rows.every((r) => Number(r.amount) > 0)
+    title.trim() !== '' &&
+    servingsNum >= 1 &&
+    servingsNum <= 100 &&
+    rows.every((r) => Number(r.amount) > 0 && nameOf(r).trim() !== '')
 
   const add = (row: Omit<Row, 'key' | 'amount' | 'staple'>) =>
     setRows((prev) => [...prev, { ...row, key: crypto.randomUUID(), amount: '1', staple: false }])
@@ -94,7 +97,7 @@ export function RecipeForm({ recipe, ingredients, products, productById, onSave,
       },
       rows.map((r) => ({
         product_id: r.product_id,
-        name: nameOf(r).slice(0, 80),
+        name: nameOf(r).trim().slice(0, 80),
         amount: Number(r.amount),
         unit: r.unit,
         staple: r.staple,

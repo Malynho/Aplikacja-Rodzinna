@@ -141,7 +141,7 @@
       "staple": "Immer da",
       "stapleTag": "immer da",
       "have": "vorhanden",
-      "missing": "{{count}} Pck. fehlen",
+      "missing": "{{count}} Pck. fehlen (du hast {{ist}} von {{packs}})",
       "manual": "von Hand ergänzen",
       "addMissing": "Fehlendes zur Liste ({{count}})",
       "addedMissing": "Zur Liste hinzugefügt: {{count}}",

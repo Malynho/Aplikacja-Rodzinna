@@ -38,7 +38,7 @@ export function RecipeView({ recipe, ingredients, shop, canWrite, onEdit, onDele
     const need = i.product_id ? needs.byProduct.get(i.product_id) : undefined
     if (!need) return <span className="muted">{t('kitchen.recipes.manual')}</span>
     return need.missing > 0 ? (
-      <span className="tag-warning">{t('kitchen.recipes.missing', { count: need.missing })}</span>
+      <span className="tag-warning">{t('kitchen.recipes.missing', { count: need.missing, ist: need.ist, packs: need.packs })}</span>
     ) : (
       <span className="muted">{t('kitchen.recipes.have')}</span>
     )

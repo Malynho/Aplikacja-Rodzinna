@@ -141,7 +141,7 @@
       "staple": "Zawsze w domu",
       "stapleTag": "zawsze w domu",
       "have": "jest",
-      "missing": "brakuje {{count}} op.",
+      "missing": "brakuje {{count}} op. (masz {{ist}} z {{packs}})",
       "manual": "dodaj ręcznie",
       "addMissing": "Dodaj brakujące do listy ({{count}})",
       "addedMissing": "Dodano do listy: {{count}}",
