@@ -12,6 +12,7 @@ export const NAV_ITEMS = [
   { to: '/kitchen', key: 'kitchen' },
   { to: '/todo', key: 'todo' },
   { to: '/notes', key: 'notes' },
+  { to: '/settings', key: 'settings' },
   { to: '/admin', key: 'admin' },
 ] as const
 
@@ -21,10 +22,12 @@ export function Layout() {
   const { family, role, loading } = useFamily()
   const [open, setOpen] = useState(false) // mobile drawer state
   const kitchenAccess = useModuleAccess('kitchen')
+  const calendarAccess = useModuleAccess('calendar')
   // Verwaltung: admins and users without a family yet (to create one). Kitchen: read or write access.
   const items = NAV_ITEMS.filter((i) => {
     if (i.key === 'admin') return !loading && (!family || role === 'admin')
     if (i.key === 'kitchen') return !loading && kitchenAccess !== 'none'
+    if (i.key === 'settings') return !loading && calendarAccess !== 'none' // the only setting so far is the calendar
     return true
   })
 

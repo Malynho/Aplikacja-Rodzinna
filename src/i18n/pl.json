@@ -2,6 +2,7 @@
   "app": { "name": "Aplikacja Rodzinna" },
   "auth": {
     "signInGoogle": "Zaloguj się przez Google",
+    "privacyLink": "Polityka prywatności",
     "signOut": "Wyloguj",
     "signInError": "Nie udało się zalogować. Spróbuj ponownie."
   },
@@ -12,6 +13,8 @@
     "todo": "To-do",
     "notes": "Notatki",
     "kitchen": "Kuchnia",
+    "calendar": "Kalendarz",
+    "settings": "Ustawienia",
     "admin": "Administracja",
     "menu": "Menu"
   },
@@ -97,7 +100,124 @@
     "today": "Dziś",
     "weekShort": "KW",
     "upcoming": "Najbliższe terminy",
-    "upcomingSoon": "Wkrótce: tu pojawią się nadchodzące wydarzenia."
+    "loading": "Wczytywanie…",
+    "none": "Brak terminów w najbliższym czasie ({{days}} dni).",
+    "unavailable": "Kalendarz niedostępny. Reszta strony działa normalnie.",
+    "partial": "Część kalendarzy jest niedostępna.",
+    "noCalendars": "Nie podłączono jeszcze żadnego kalendarza.",
+    "connect": "Podłącz kalendarz",
+    "private": "Prywatne",
+    "allDay": "cały dzień",
+    "noneOnDay": "Brak terminów tego dnia.",
+    "eventCount_one": "{{count}} termin",
+    "eventCount_few": "{{count}} terminy",
+    "eventCount_many": "{{count}} terminów",
+    "eventCount_other": "{{count}} terminu",
+    "filter": { "label": "Pokazuj kalendarze", "shared": "Wspólne", "mine": "Moje" },
+    "counter": "Najbliższy termin: {{title}}, {{when}}",
+    "when": {
+      "now": "teraz",
+      "today": "dziś",
+      "tomorrow": "jutro",
+      "in": "za {{time}}",
+      "hours": "{{count}} godz.",
+      "minutes": "{{count}} min",
+      "inDays_one": "za {{count}} dzień",
+      "inDays_few": "za {{count}} dni",
+      "inDays_many": "za {{count}} dni",
+      "inDays_other": "za {{count}} dni"
+    }
+  },
+  "settings": {
+    "title": "Ustawienia konta",
+    "myCalendar": "Mój kalendarz",
+    "noAccess": "Nie masz dostępu do kalendarza. Poproś administratora o uprawnienie."
+  },
+  "calendars": {
+    "sharedTitle": "Kalendarz wspólny",
+    "sharedIntro": "Kalendarz widoczny dla całej rodziny, np. „Rodzina”. Rejestrujesz go ze swojego konta Google (jako administrator). Terminy są czytane na żywo z Google i nigdzie nie są kopiowane.",
+    "personalIntro": "Twój kalendarz Google. Terminy są czytane na żywo i nigdzie nie są kopiowane. „Tylko ja” oznacza, że widzisz go tylko Ty (administrator też nie).",
+    "connection": {
+      "checking": "Sprawdzam połączenie z Google…",
+      "off": "Kalendarz Google nie jest połączony. Zgoda dotyczy odczytu i dodawania wydarzeń w Twoich kalendarzach.",
+      "ok": "Połączono z kontem Google.",
+      "reconnectNeeded": "Połączenie wygasło lub zostało odwołane.",
+      "connect": "Połącz kalendarz",
+      "reconnect": "Połącz kalendarz ponownie",
+      "disconnect": "Odłącz",
+      "confirmDisconnect": "Odłączyć kalendarz Google? Dodane przez Ciebie kalendarze zostaną usunięte z aplikacji.",
+      "saved": "Kalendarz Google został połączony.",
+      "signOut": "Wyloguj się"
+    },
+    "pick": "Kalendarz Google",
+    "pickPlaceholder": "Wybierz kalendarz…",
+    "loadingList": "Wczytywanie kalendarzy…",
+    "roles": { "owner": "właściciel", "writer": "edycja", "reader": "tylko odczyt" },
+    "label": "Nazwa w aplikacji",
+    "visibility": "Widoczność",
+    "visibilityOptions": { "private": "Tylko ja", "family": "Rodzina" },
+    "add": "Dodaj kalendarz",
+    "edit": "Edytuj",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "remove": "Usuń",
+    "confirmRemove": "Usunąć kalendarz {{name}}?",
+    "empty": "Brak dodanych kalendarzy.",
+    "errors": {
+      "not_connected": "Kalendarz Google nie jest połączony. Połącz go w Ustawieniach.",
+      "reconnect": "Połączenie z Google wygasło. Połącz kalendarz ponownie.",
+      "owner_reconnect": "Właściciel kalendarza musi go ponownie połączyć.",
+      "missing_scope": "Nie przyznano wszystkich uprawnień do kalendarza. Połącz ponownie i zaznacz wszystkie pola na ekranie zgody.",
+      "wrong_account": "Zalogowano innym kontem Google niż w aplikacji. Nic nie zapisano. Wyloguj się i spróbuj ponownie tym samym kontem.",
+      "not_found": "Ten kalendarz nie jest już dostępny na koncie Google.",
+      "not_configured": "Brak konfiguracji po stronie serwera: w Supabase (Edge Functions → Secrets) brakuje GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET lub CALENDAR_TOKEN_KEY.",
+      "not_deployed": "Funkcja „calendar” nie odpowiada: nie została jeszcze wdrożona w Supabase (albo brak połączenia z serwerem).",
+      "upstream_error": "Google nie odpowiedział poprawnie: usługa jest chwilowo niedostępna albo Google Calendar API jest wyłączone w projekcie Google Cloud. Spróbuj za chwilę.",
+      "function_error": "Funkcja zwróciła nieoczekiwany błąd. Sprawdź jej logi w panelu Supabase.",
+      "limit_reached": "Za dużo prób. Spróbuj ponownie za godzinę.",
+      "forbidden": "Brak uprawnień do kalendarza.",
+      "bad_request": "Nieprawidłowe dane.",
+      "duplicate": "Ten kalendarz jest już dodany w rodzinie.",
+      "error": "Nie udało się zapisać zmiany."
+    }
+  },
+  "privacy": {
+    "title": "Polityka prywatności",
+    "intro": "To prywatna aplikacja rodzinna, z której korzysta wyłącznie nasza rodzina. Nie jest usługą publiczną ani komercyjną.",
+    "sections": {
+      "data": {
+        "title": "Jakie dane zbieramy",
+        "text": "Imię i adres e-mail Twojego konta Google (logowanie) oraz to, co sam wpisujesz w aplikacji: listy zakupów, przepisy, plan obiadów i ustawienia. Dane przechowujemy w usłudze Supabase, a stronę udostępnia Cloudflare."
+      },
+      "calendar": {
+        "title": "Kalendarz Google",
+        "text": "Jeśli połączysz kalendarz, aplikacja czyta Twoje terminy na żywo z Google, tylko z kalendarzy wybranych przez Ciebie. Terminy nie są kopiowane do naszej bazy danych ani nigdzie zapisywane. Zapisujemy wyłącznie token odświeżający, zaszyfrowany, dzięki któremu aplikacja może czytać terminy bez ponownego logowania. Zgoda obejmuje także dodawanie wydarzeń; aplikacja robi to wyłącznie na Twoje polecenie. Termin oznaczony w Google jako prywatny jest ukryty przed innymi osobami z rodziny, a kalendarz ustawiony na „tylko ja” widzisz tylko Ty."
+      },
+      "receipts": {
+        "title": "Zdjęcia paragonów",
+        "text": "Zdjęcie paragonu jest wysyłane do API firmy Anthropic wyłącznie po to, aby odczytać pozycje. Nie zapisujemy go w bazie danych ani w plikach i nie umieszczamy go w logach."
+      },
+      "services": {
+        "title": "Pogoda i święta",
+        "text": "Pogodę pobieramy z Open-Meteo, a święta z Nager.Date. Wysyłamy tam tylko współrzędne miejsca (pogoda) albo kod kraju i rok (święta), bez imienia, e-maila i innych danych osobowych."
+      },
+      "sharing": {
+        "title": "Brak sprzedaży i reklam",
+        "text": "Nie sprzedajemy danych, nie przekazujemy ich reklamodawcom i nie wyświetlamy reklam."
+      },
+      "deletion": {
+        "title": "Usuwanie danych",
+        "text": "Przycisk „Odłącz” przy połączeniu z kalendarzem w Ustawieniach usuwa zapisany token i odwołuje dostęp w Google. Konto i dane rodziny usuwa administrator. Dostęp aplikacji do konta Google możesz też w każdej chwili cofnąć w ustawieniach swojego konta Google."
+      },
+      "google": {
+        "title": "Dane z Google",
+        "text": "Wykorzystanie informacji otrzymanych z API Google jest zgodne z Google API Services User Data Policy, w tym z wymogami Limited Use."
+      }
+    },
+    "googlePolicyLink": "Google API Services User Data Policy",
+    "contactTitle": "Kontakt",
+    "contactText": "Pytania i prośby o usunięcie danych:",
+    "back": "Wróć do aplikacji"
   },
   "kitchen": {
     "tabs": {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 
 // Modules that carry a per-member permission (Verwaltung itself is admin-only).
-const MODULES = ['kitchen', 'todo', 'notes'] as const
+const MODULES = ['kitchen', 'todo', 'notes', 'calendar'] as const
 const LEVELS = ['none', 'read', 'write'] as const
 type Level = (typeof LEVELS)[number]
 

@@ -583,6 +583,13 @@ h3 {
   text-align: center;
 }
 
+.login-card a {
+  color: var(--accent);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .login-card h1 {
   margin: 0;
 }
@@ -656,8 +663,7 @@ h3 {
 
 .calendar {
   display: grid;
-  grid-template-columns: 1.75rem repeat(7, minmax(0, 1fr));
-  gap: 2px;
+  grid-template-columns: 1.5rem repeat(7, minmax(44px, 1fr));
   text-align: center;
 }
 
@@ -674,6 +680,12 @@ h3 {
   place-items: center;
   align-content: center;
   border-radius: 12px;
+  padding: 0;
+}
+
+.cal-day.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .cal-day.other {
@@ -711,6 +723,89 @@ h3 {
   box-shadow: 0 0 0 1.5px var(--on-accent);
 }
 
+.dot-event {
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+}
+
+/* Calendar filter chips, event lines, the "next event" counter */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--track);
+  font-weight: 600;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.event-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.event-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.event-cal {
+  font-size: 0.8rem;
+}
+
+.next-event {
+  margin: 0;
+  font-weight: 800;
+  margin-top: clamp(12px, 2vw, 24px);
+}
+
+/* Narrow phones: smaller side margins so the day buttons keep 44 px; below 360 px the week column goes */
+@media (max-width: 400px) {
+  .content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* the calendar card gives its side padding to the day buttons (7 x 44 px + week column) */
+  .calendar-card {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .calendar-card > :not(.calendar) {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .calendar {
+    grid-template-columns: 1.25rem repeat(7, minmax(44px, 1fr));
+  }
+}
+
+@media (max-width: 359px) {
+  .calendar {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .cal-week {
+    display: none;
+  }
+}
+
 .cal-list {
   margin: 0;
   padding: 0;
@@ -718,6 +813,41 @@ h3 {
   display: grid;
   gap: 4px;
   font-size: 0.9rem;
+}
+
+/* Calendar connections: touch-sized controls */
+.cal-links button,
+.cal-links .input {
+  min-height: 44px;
+}
+
+/* Public privacy page */
+.legal {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  line-height: 1.6;
+}
+
+/* long German words (Datenschutzerklärung) must not push the page wider than the screen */
+.legal {
+  overflow-wrap: break-word;
+}
+
+.legal h1 {
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
+}
+
+.legal .controls {
+  margin-bottom: 16px;
+}
+
+.legal .segmented button {
+  min-height: 44px;
+}
+
+.legal a {
+  color: var(--accent);
 }
 
 /* Recipe steps keep the line breaks of the text. */

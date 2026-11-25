@@ -47,7 +47,7 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
   Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
-  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state. Next: 0013.
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state, 0013 calendar links, 0014 Google OAuth, 0015 calendar filter. Next: 0016.
   Pantry triggers: bought shopping item (checked false->true) raises `ist`; a falling `ist` sets the open shopping
   item to `soll - ist` (`add_pantry_shortages`). Neither trigger touches the column that fires the other (no loop).
 - Applying migrations (Supabase CLI 3.x targets the local stack by default, so the scripts always pass `--remote`
@@ -65,6 +65,14 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   `add_missing_to_list` sets the open list quantity to max(existing, missing); recipes are saved atomically by `save_recipe`.
 - Start page: public holidays PL/DE come from Nager.Date (`src/lib/holidays.ts`, cached 30 days in localStorage, errors = nothing
   shown); `families.home_state` (admin-editable in Verwaltung) picks the German state that is highlighted.
+- Calendar (read-only so far, 4b): Google OAuth, no service account. "Connect calendar" asks for `calendar.events` +
+  `calendar.calendarlist.readonly` (offline + consent); the refresh token is sent once to the Edge Function `calendar`
+  (only when sessionStorage marks a connect flow of the same user), which stores it AES-GCM encrypted in
+  `google_tokens` (RLS, no client access; service role only in two helpers: read the owner's token, write one's own).
+  Secrets GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CALENDAR_TOKEN_KEY are set by the user in Supabase, never in the repo.
+  Events are read live with the token of the calendar's OWNER and never stored; the user id always comes from getUser().
+  Permission module `calendar`. `calendar_links` always has an owner; "shared" ones are registered by admins; a private
+  link is invisible to everyone but its owner (admins too). Private/confidential events are masked for non-owners.
 - Receipt scanning (`scan-receipt` + `apply_receipt`): nothing changes before the user confirms; the approval
   button is locked from the first click until saving ends.
 - Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`

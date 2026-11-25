@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthProvider'
 import { useFamily } from '../family/FamilyProvider'
+import { useModuleAccess } from '../hooks/useModuleAccess'
 import { useWeather, type Weather } from '../hooks/useWeather'
 import { isoWeek, toDay } from '../lib/date'
 import { appliesTo, useHolidays } from '../lib/holidays'
+import { CalendarArea } from './CalendarArea'
 import { MonthCalendar } from './MonthCalendar'
 
 interface Props {
@@ -11,10 +13,11 @@ interface Props {
   weather: Weather | null
   weatherError: boolean
   homeState: string
+  calendar?: { familyId: string; userId: string } // set for people with calendar access
 }
 
 // The start page without data loading (so the layout can be checked with fixed data).
-export function StartView({ name, weather, weatherError, homeState }: Props) {
+export function StartView({ name, weather, weatherError, homeState, calendar }: Props) {
   const { t, i18n } = useTranslation()
   const now = new Date()
   const holidays = useHolidays([now.getFullYear()])
@@ -54,20 +57,29 @@ export function StartView({ name, weather, weatherError, homeState }: Props) {
           )}
         </span>
       </div>
-      <div className="dashboard">
-        <MonthCalendar homeState={homeState} />
-        <div className="card stack">
-          <h2>{t('calendar.upcoming')}</h2>
-          <p className="muted">{t('calendar.upcomingSoon')}</p>
+      {calendar ? (
+        <CalendarArea familyId={calendar.familyId} userId={calendar.userId} homeState={homeState} />
+      ) : (
+        <div className="dashboard">
+          <MonthCalendar homeState={homeState} />
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
 export function Dashboard() {
-  const { firstName } = useAuth()
+  const { firstName, user } = useAuth()
   const { family } = useFamily()
   const { weather, error } = useWeather()
-  return <StartView name={firstName} weather={weather} weatherError={!!error} homeState={family?.home_state ?? 'DE-HE'} />
+  const hasCalendar = useModuleAccess('calendar') !== 'none'
+  return (
+    <StartView
+      name={firstName}
+      weather={weather}
+      weatherError={!!error}
+      homeState={family?.home_state ?? 'DE-HE'}
+      calendar={family && user && hasCalendar ? { familyId: family.id, userId: user.id } : undefined}
+    />
+  )
 }

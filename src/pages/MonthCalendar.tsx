@@ -1,21 +1,35 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useCalendarEvents } from '../hooks/useCalendarEvents'
+import type { CalendarSettings } from '../hooks/useCalendarSettings'
+import { daysOf, type CalendarEvent } from '../lib/calendar'
 import { addDays, isoWeek, mondayOf, toDay } from '../lib/date'
 import { appliesTo, useHolidays } from '../lib/holidays'
+import { EventLine } from './EventLine'
 
 const FLAGS = { PL: '🇵🇱', DE: '🇩🇪' }
+const MAX_EVENT_DOTS = 3
 const firstOfThisMonth = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 
-// Month view (weeks start on Monday) with week numbers, today, and the PL / DE (home state) holidays.
-export function MonthCalendar({ homeState }: { homeState: string }) {
+interface Props {
+  homeState: string
+  calendar?: { familyId: string; settings: CalendarSettings } // without it only holidays are shown
+}
+
+// Month view (weeks start on Monday) with week numbers, today, PL / DE (home state) holidays and,
+// when a calendar is connected, a dot per event; tapping a day lists its events (read-only).
+export function MonthCalendar({ homeState, calendar }: Props) {
   const { t, i18n } = useTranslation()
   const [month, setMonth] = useState(firstOfThisMonth)
   const today = toDay(new Date())
+  const [selected, setSelected] = useState(today)
 
   const start = mondayOf(month)
   const last = new Date(month.getFullYear(), month.getMonth() + 1, 0)
   const weeks = Math.round((mondayOf(last).getTime() - start.getTime()) / (7 * 86400000)) + 1
   const holidays = useHolidays([start.getFullYear(), last.getFullYear()])
+  const settings = calendar?.settings
+  const loaded = useCalendarEvents(calendar?.familyId ?? null, start.getTime(), addDays(start, weeks * 7).getTime())
 
   // holidays by day: Poland always, Germany only when it applies in the family's state
   const byDay = new Map<string, { country: 'PL' | 'DE'; name: string }[]>()
@@ -26,14 +40,22 @@ export function MonthCalendar({ homeState }: { homeState: string }) {
     }
   }
 
+  // events of the switched-on calendars by day
+  const eventsByDay = new Map<string, CalendarEvent[]>()
+  for (const e of loaded.events) {
+    if (!settings?.isOn(e.calendar_link_id)) continue
+    for (const day of daysOf(e)) eventsByDay.set(day, [...(eventsByDay.get(day) ?? []), e])
+  }
+
   const monthKey = toDay(month).slice(0, 7)
   const inMonth = [...byDay.entries()].filter(([day]) => day.startsWith(monthKey)).sort(([a], [b]) => a.localeCompare(b))
   const dayName = new Intl.DateTimeFormat(i18n.language, { weekday: 'short' })
   const dayMonth = new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short' })
   const shift = (by: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + by, 1))
+  const selectedEvents = eventsByDay.get(selected) ?? []
 
   return (
-    <div className="card stack">
+    <div className="card stack calendar-card">
       <div className="row cal-nav">
         <button aria-label={t('calendar.prev')} onClick={() => shift(-1)}>
           ‹
@@ -41,7 +63,13 @@ export function MonthCalendar({ homeState }: { homeState: string }) {
         <strong className="grow">
           {new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(month)}
         </strong>
-        <button className="link-btn" onClick={() => setMonth(firstOfThisMonth())}>
+        <button
+          className="link-btn"
+          onClick={() => {
+            setMonth(firstOfThisMonth())
+            setSelected(today)
+          }}
+        >
           {t('calendar.today')}
         </button>
         <button aria-label={t('calendar.next')} onClick={() => shift(1)}>
@@ -65,26 +93,56 @@ export function MonthCalendar({ homeState }: { homeState: string }) {
               const date = addDays(monday, i)
               const day = toDay(date)
               const marks = byDay.get(day) ?? []
+              const events = eventsByDay.get(day) ?? []
               const names = marks.map((m) => m.name).join(', ')
+              const label = [
+                `${date.getDate()}`,
+                events.length > 0 ? t('calendar.eventCount', { count: events.length }) : '',
+                names,
+              ]
+                .filter(Boolean)
+                .join(', ')
               return (
-                <span
+                <button
                   key={day}
-                  className={`cal-day${date.getMonth() !== month.getMonth() ? ' other' : ''}${day === today ? ' today' : ''}`}
+                  className={`cal-day${date.getMonth() !== month.getMonth() ? ' other' : ''}${day === today ? ' today' : ''}${day === selected ? ' selected' : ''}`}
                   title={names || undefined}
-                  aria-label={names ? `${date.getDate()}, ${names}` : undefined}
+                  aria-label={label}
+                  aria-pressed={day === selected}
+                  onClick={() => setSelected(day)}
                 >
                   {date.getDate()}
                   <span className="cal-dots" aria-hidden="true">
                     {marks.map((m) => (
                       <span key={m.country} className={`dot ${m.country}`} />
                     ))}
+                    {events.slice(0, MAX_EVENT_DOTS).map((e) => (
+                      <span key={`${e.calendar_link_id}${e.id}`} className="dot-event" style={{ background: settings?.colorOf(e.calendar_link_id) }} />
+                    ))}
                   </span>
-                </span>
+                </button>
               )
             }),
           ]
         })}
       </div>
+      {settings && (
+        <div className="stack">
+          <h3>{new Intl.DateTimeFormat(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${selected}T12:00:00`))}</h3>
+          {selectedEvents.length === 0 ? (
+            <p className="muted">{t('calendar.noneOnDay')}</p>
+          ) : (
+            selectedEvents.map((e) => (
+              <EventLine
+                key={`${e.calendar_link_id}${e.id}`}
+                event={e}
+                color={settings.colorOf(e.calendar_link_id)}
+                calendar={settings.labelOf(e.calendar_link_id)}
+              />
+            ))
+          )}
+        </div>
+      )}
       {inMonth.length > 0 && (
         <ul className="cal-list">
           {inMonth.map(([day, marks]) => (

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { UndoToast, useUndo } from '../../components/UndoToast'
+import { useNames } from '../../hooks/useNames'
 import type { KitchenData } from '../../hooks/useKitchen'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import { addDays, isoWeek, mondayOf, toDay } from '../../lib/date'
 import { missingList, needsFor } from '../../lib/recipeNeeds'
-import { supabase } from '../../lib/supabase'
 import type { MealWish, Recipe, WishValues } from './recipeTypes'
 
 interface FormProps {
@@ -98,21 +98,10 @@ export function MealPlan() {
   const undo = useUndo()
   const [monday, setMonday] = useState(() => mondayOf(new Date()))
   const [form, setForm] = useState<{ day: string; wish?: MealWish } | null>(null)
-  const [names, setNames] = useState<Map<string, string>>(new Map())
 
   // Who wished what: names from the profiles, colors by the order of the authors.
   const authors = [...new Set(shop.wishes.map((w) => w.wished_by))].sort()
-  const authorKey = authors.join(',')
-  useEffect(() => {
-    if (authors.length === 0) return
-    supabase
-      .from('profiles')
-      .select('id, display_name')
-      .in('id', authors)
-      .then(({ data }) => setNames(new Map((data ?? []).map((p) => [p.id as string, (p.display_name as string | null) ?? '']))))
-    // authors is derived from authorKey
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authorKey])
+  const names = useNames(authors)
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i))
   const today = toDay(new Date())

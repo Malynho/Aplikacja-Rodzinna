@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthProvider'
 import { Controls } from '../components/Controls'
@@ -18,6 +18,7 @@ export function Login() {
           {t('auth.signInGoogle')}
         </button>
         <Controls />
+        <Link to="/datenschutz">{t('auth.privacyLink')}</Link>
       </div>
     </div>
   )

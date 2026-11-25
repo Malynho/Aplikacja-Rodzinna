@@ -13,6 +13,8 @@ import { Dashboard } from './pages/Dashboard'
 import { ModulePage } from './pages/ModulePage'
 import { MealPlan } from './pages/kitchen/MealPlan'
 import { Recipes } from './pages/kitchen/Recipes'
+import { Privacy } from './pages/Privacy'
+import { Settings } from './pages/Settings'
 
 export default function App() {
   return (
@@ -22,10 +24,12 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/invite" element={<AcceptInvite />} />
+            <Route path="/datenschutz" element={<Privacy />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="/kitchen" element={<Kitchen />}>
                   <Route index element={<Navigate to="shopping" replace />} />
                   <Route path="shopping" element={<Shopping />} />
@@ -33,7 +37,7 @@ export default function App() {
                   <Route path="recipes" element={<Recipes />} />
                   <Route path="meal-plan" element={<MealPlan />} />
                 </Route>
-                {NAV_ITEMS.filter((i) => !['/', '/admin', '/kitchen'].includes(i.to)).map(({ to, key }) => (
+                {NAV_ITEMS.filter((i) => !['/', '/admin', '/kitchen', '/settings'].includes(i.to)).map(({ to, key }) => (
                   <Route key={to} path={to} element={<ModulePage titleKey={`nav.${key}`} />} />
                 ))}
               </Route>

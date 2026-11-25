@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import { FunctionsHttpError } from '@supabase/supabase-js'
 import i18n from '../i18n'
+import { functionErrorCode } from '../lib/functionError'
 import { supabase } from '../lib/supabase'
 import { STARTER_PRODUCTS } from '../pages/kitchen/starterProducts'
 import {
@@ -207,14 +207,7 @@ export function useKitchen(familyId: string) {
         body: { family_id: familyId, image_base64: imageBase64, catalog },
       })
       if (err) {
-        let code = 'scan_failed'
-        if (err instanceof FunctionsHttpError) {
-          try {
-            code = (await err.context.json()).error ?? code
-          } catch {
-            // keep the generic code
-          }
-        }
+        const code = await functionErrorCode(err, 'scan_failed')
         return { error: ['forbidden', 'limit_reached', 'bad_request'].includes(code) ? code : 'scan_failed' }
       }
       return { items: (data?.items ?? []) as ReceiptItem[] }

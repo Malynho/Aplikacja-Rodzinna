@@ -2,6 +2,7 @@
   "app": { "name": "Familien-App" },
   "auth": {
     "signInGoogle": "Mit Google anmelden",
+    "privacyLink": "Datenschutz",
     "signOut": "Abmelden",
     "signInError": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
   },
@@ -12,6 +13,8 @@
     "todo": "To-do",
     "notes": "Notizen",
     "kitchen": "Küche",
+    "calendar": "Kalender",
+    "settings": "Einstellungen",
     "admin": "Verwaltung",
     "menu": "Menü"
   },
@@ -97,7 +100,120 @@
     "today": "Heute",
     "weekShort": "KW",
     "upcoming": "Nächste Termine",
-    "upcomingSoon": "Demnächst: hier erscheinen die kommenden Termine."
+    "loading": "Wird geladen…",
+    "none": "Keine Termine in nächster Zeit ({{days}} Tage).",
+    "unavailable": "Kalender nicht verfügbar. Der Rest der Seite funktioniert normal.",
+    "partial": "Ein Teil der Kalender ist nicht verfügbar.",
+    "noCalendars": "Es ist noch kein Kalender verbunden.",
+    "connect": "Kalender verbinden",
+    "private": "Privat",
+    "allDay": "ganztägig",
+    "noneOnDay": "Keine Termine an diesem Tag.",
+    "eventCount_one": "{{count}} Termin",
+    "eventCount_other": "{{count}} Termine",
+    "filter": { "label": "Kalender anzeigen", "shared": "Gemeinsam", "mine": "Meine" },
+    "counter": "Nächster Termin: {{title}}, {{when}}",
+    "when": {
+      "now": "jetzt",
+      "today": "heute",
+      "tomorrow": "morgen",
+      "in": "in {{time}}",
+      "hours": "{{count}} Std.",
+      "minutes": "{{count}} Min.",
+      "inDays_one": "in {{count}} Tag",
+      "inDays_other": "in {{count}} Tagen"
+    }
+  },
+  "settings": {
+    "title": "Kontoeinstellungen",
+    "myCalendar": "Mein Kalender",
+    "noAccess": "Du hast keinen Zugriff auf den Kalender. Bitte den Administrator um die Berechtigung."
+  },
+  "calendars": {
+    "sharedTitle": "Gemeinsamer Kalender",
+    "sharedIntro": "Kalender, den die ganze Familie sieht, z. B. „Familie“. Du registrierst ihn mit deinem Google-Konto (als Administrator). Termine werden live von Google gelesen und nirgends kopiert.",
+    "personalIntro": "Dein Google-Kalender. Termine werden live gelesen und nirgends kopiert. „Nur ich“ heißt: nur du siehst ihn (auch der Administrator nicht).",
+    "connection": {
+      "checking": "Verbindung zu Google wird geprüft…",
+      "off": "Der Google-Kalender ist nicht verbunden. Die Zustimmung betrifft das Lesen und Hinzufügen von Terminen in deinen Kalendern.",
+      "ok": "Mit dem Google-Konto verbunden.",
+      "reconnectNeeded": "Die Verbindung ist abgelaufen oder wurde widerrufen.",
+      "connect": "Kalender verbinden",
+      "reconnect": "Kalender erneut verbinden",
+      "disconnect": "Trennen",
+      "confirmDisconnect": "Google-Kalender trennen? Die von dir hinzugefügten Kalender werden aus der App entfernt.",
+      "saved": "Der Google-Kalender wurde verbunden.",
+      "signOut": "Abmelden"
+    },
+    "pick": "Google-Kalender",
+    "pickPlaceholder": "Kalender auswählen…",
+    "loadingList": "Kalender werden geladen…",
+    "roles": { "owner": "Eigentümer", "writer": "Bearbeiten", "reader": "nur Lesen" },
+    "label": "Name in der App",
+    "visibility": "Sichtbarkeit",
+    "visibilityOptions": { "private": "Nur ich", "family": "Familie" },
+    "add": "Kalender hinzufügen",
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "remove": "Entfernen",
+    "confirmRemove": "Kalender {{name}} entfernen?",
+    "empty": "Keine Kalender hinzugefügt.",
+    "errors": {
+      "not_connected": "Der Google-Kalender ist nicht verbunden. Verbinde ihn in den Einstellungen.",
+      "reconnect": "Die Verbindung zu Google ist abgelaufen. Verbinde den Kalender erneut.",
+      "owner_reconnect": "Der Besitzer des Kalenders muss ihn erneut verbinden.",
+      "missing_scope": "Nicht alle Berechtigungen für den Kalender wurden erteilt. Verbinde erneut und hake auf dem Zustimmungsbildschirm alle Felder an.",
+      "wrong_account": "Du hast dich mit einem anderen Google-Konto angemeldet als in der App. Es wurde nichts gespeichert. Melde dich ab und versuche es mit demselben Konto erneut.",
+      "not_found": "Dieser Kalender ist im Google-Konto nicht mehr verfügbar.",
+      "not_configured": "Serverseitig nicht eingerichtet: In Supabase (Edge Functions → Secrets) fehlen GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET oder CALENDAR_TOKEN_KEY.",
+      "not_deployed": "Die Funktion „calendar“ antwortet nicht: Sie ist in Supabase noch nicht bereitgestellt (oder keine Verbindung zum Server).",
+      "upstream_error": "Google hat nicht korrekt geantwortet: der Dienst ist vorübergehend nicht erreichbar oder die Google Calendar API ist im Google-Cloud-Projekt deaktiviert. Versuche es gleich noch einmal.",
+      "function_error": "Die Funktion hat einen unerwarteten Fehler gemeldet. Prüfe ihre Logs im Supabase-Dashboard.",
+      "limit_reached": "Zu viele Versuche. Versuche es in einer Stunde erneut.",
+      "forbidden": "Keine Berechtigung für den Kalender.",
+      "bad_request": "Ungültige Daten.",
+      "duplicate": "Dieser Kalender ist bereits in der Familie hinzugefügt.",
+      "error": "Die Änderung konnte nicht gespeichert werden."
+    }
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "intro": "Dies ist eine private Familien-App, die nur von unserer Familie genutzt wird. Sie ist kein öffentlicher oder kommerzieller Dienst.",
+    "sections": {
+      "data": {
+        "title": "Welche Daten wir verarbeiten",
+        "text": "Name und E-Mail-Adresse deines Google-Kontos (Anmeldung) sowie das, was du selbst in der App einträgst: Einkaufslisten, Rezepte, Essensplan und Einstellungen. Die Daten liegen bei Supabase, die Seite wird von Cloudflare ausgeliefert."
+      },
+      "calendar": {
+        "title": "Google-Kalender",
+        "text": "Wenn du deinen Kalender verbindest, liest die App deine Termine live von Google, nur aus den Kalendern, die du ausgewählt hast. Die Termine werden weder in unsere Datenbank kopiert noch irgendwo gespeichert. Gespeichert wird nur ein verschlüsselter Aktualisierungstoken, mit dem die App die Termine ohne erneute Anmeldung lesen kann. Die Zustimmung umfasst auch das Hinzufügen von Terminen; die App tut das nur auf deine Anweisung. Ein in Google als privat markierter Termin ist für andere Familienmitglieder verborgen, und einen Kalender mit „Nur ich“ siehst nur du."
+      },
+      "receipts": {
+        "title": "Kassenbon-Fotos",
+        "text": "Das Foto eines Kassenbons wird nur zum Auslesen der Positionen an die API von Anthropic gesendet. Wir speichern es weder in der Datenbank noch in Dateien und schreiben es nicht in Protokolle."
+      },
+      "services": {
+        "title": "Wetter und Feiertage",
+        "text": "Das Wetter kommt von Open-Meteo, die Feiertage von Nager.Date. Dorthin senden wir nur die Koordinaten des Ortes (Wetter) bzw. den Ländercode und das Jahr (Feiertage), ohne Namen, E-Mail oder andere personenbezogene Daten."
+      },
+      "sharing": {
+        "title": "Kein Verkauf, keine Werbung",
+        "text": "Wir verkaufen keine Daten, geben sie nicht an Werbetreibende weiter und zeigen keine Werbung."
+      },
+      "deletion": {
+        "title": "Löschung der Daten",
+        "text": "Die Schaltfläche „Trennen“ bei der Kalenderverbindung in den Einstellungen löscht den gespeicherten Token und widerruft den Zugriff bei Google. Das Konto und die Familiendaten löscht der Administrator. Den Zugriff der App auf dein Google-Konto kannst du außerdem jederzeit in den Einstellungen deines Google-Kontos widerrufen."
+      },
+      "google": {
+        "title": "Daten von Google",
+        "text": "Die Verwendung von Informationen, die von Google-APIs empfangen werden, entspricht der Google API Services User Data Policy, einschließlich der Limited-Use-Anforderungen."
+      }
+    },
+    "googlePolicyLink": "Google API Services User Data Policy",
+    "contactTitle": "Kontakt",
+    "contactText": "Fragen und Anträge auf Löschung der Daten:",
+    "back": "Zurück zur App"
   },
   "kitchen": {
     "tabs": {
