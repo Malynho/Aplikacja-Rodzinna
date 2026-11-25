@@ -17,6 +17,29 @@
   },
   "module": { "comingSoon": "Dieses Modul folgt bald." },
   "admin": {
+    "region": {
+      "title": "Region",
+      "label": "Bundesland der Familie (Feiertage in Deutschland)",
+      "error": "Die Änderung konnte nicht gespeichert werden.",
+      "states": {
+        "DE-BB": "Brandenburg",
+        "DE-BE": "Berlin",
+        "DE-BW": "Baden-Württemberg",
+        "DE-BY": "Bayern",
+        "DE-HB": "Bremen",
+        "DE-HE": "Hessen",
+        "DE-HH": "Hamburg",
+        "DE-MV": "Mecklenburg-Vorpommern",
+        "DE-NI": "Niedersachsen",
+        "DE-NW": "Nordrhein-Westfalen",
+        "DE-RP": "Rheinland-Pfalz",
+        "DE-SH": "Schleswig-Holstein",
+        "DE-SL": "Saarland",
+        "DE-SN": "Sachsen",
+        "DE-ST": "Sachsen-Anhalt",
+        "DE-TH": "Thüringen"
+      }
+    },
     "createFamily": {
       "title": "Familie erstellen",
       "name": "Name der Familie",
@@ -66,6 +89,15 @@
     "rain": "Regen",
     "snow": "Schnee",
     "thunder": "Gewitter"
+  },
+  "holidays": { "nationwide": "bundesweit" },
+  "calendar": {
+    "prev": "Vorheriger Monat",
+    "next": "Nächster Monat",
+    "today": "Heute",
+    "weekShort": "KW",
+    "upcoming": "Nächste Termine",
+    "upcomingSoon": "Demnächst: hier erscheinen die kommenden Termine."
   },
   "kitchen": {
     "tabs": {

@@ -17,6 +17,29 @@
   },
   "module": { "comingSoon": "Ten moduł pojawi się wkrótce." },
   "admin": {
+    "region": {
+      "title": "Region",
+      "label": "Kraj związkowy rodziny (święta w Niemczech)",
+      "error": "Nie udało się zapisać zmiany.",
+      "states": {
+        "DE-BB": "Brandenburgia",
+        "DE-BE": "Berlin",
+        "DE-BW": "Badenia-Wirtembergia",
+        "DE-BY": "Bawaria",
+        "DE-HB": "Brema",
+        "DE-HE": "Hesja",
+        "DE-HH": "Hamburg",
+        "DE-MV": "Meklemburgia-Pomorze Przednie",
+        "DE-NI": "Dolna Saksonia",
+        "DE-NW": "Nadrenia Północna-Westfalia",
+        "DE-RP": "Nadrenia-Palatynat",
+        "DE-SH": "Szlezwik-Holsztyn",
+        "DE-SL": "Saara",
+        "DE-SN": "Saksonia",
+        "DE-ST": "Saksonia-Anhalt",
+        "DE-TH": "Turyngia"
+      }
+    },
     "createFamily": {
       "title": "Utwórz rodzinę",
       "name": "Nazwa rodziny",
@@ -66,6 +89,15 @@
     "rain": "Deszcz",
     "snow": "Śnieg",
     "thunder": "Burza"
+  },
+  "holidays": { "nationwide": "cały kraj" },
+  "calendar": {
+    "prev": "Poprzedni miesiąc",
+    "next": "Następny miesiąc",
+    "today": "Dziś",
+    "weekShort": "KW",
+    "upcoming": "Najbliższe terminy",
+    "upcomingSoon": "Wkrótce: tu pojawią się nadchodzące wydarzenia."
   },
   "kitchen": {
     "tabs": {

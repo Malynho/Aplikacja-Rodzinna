@@ -177,6 +177,13 @@ button {
   display: none;
   font-size: 1.4rem;
   margin-right: auto;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.topbar .link-btn,
+.topbar .segmented button {
+  min-height: 44px;
 }
 
 .content {
@@ -613,6 +620,104 @@ h3 {
   .topbar {
     flex-wrap: wrap;
   }
+}
+
+/* Start page: one column on phones, two when there is room (no fixed breakpoints) */
+.start h1 {
+  font-size: clamp(1.6rem, 5vw, 2.25rem);
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(12px, 2vw, 24px);
+  margin-top: clamp(12px, 2vw, 24px);
+  align-items: start;
+}
+
+.pill.holiday {
+  color: var(--text-muted);
+}
+
+.pill.holiday.home {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Month calendar: week number column + 7 days */
+.cal-nav button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.cal-nav button:not(.link-btn) {
+  font-size: 1.4rem;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: 1.75rem repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-head,
+.cal-week {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  align-self: center;
+}
+
+.cal-day {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border-radius: 12px;
+}
+
+.cal-day.other {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.cal-day.today {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+}
+
+.cal-dots {
+  display: flex;
+  gap: 3px;
+  height: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dot.DE {
+  background: var(--accent);
+}
+
+.dot.PL {
+  background: var(--danger);
+}
+
+.cal-day.today .dot {
+  box-shadow: 0 0 0 1.5px var(--on-accent);
+}
+
+.cal-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
 }
 
 /* Recipe steps keep the line breaks of the text. */

@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthProvider'
 export interface Family {
   id: string
   name: string
+  home_state: string // ISO 3166-2 code of the German state (public holidays)
 }
 type Role = 'admin' | 'member'
 export type Level = 'none' | 'read' | 'write'
@@ -40,7 +41,7 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     }
     const { data } = await supabase
       .from('family_members')
-      .select('role, families(id, name, created_at)')
+      .select('role, families(id, name, created_at, home_state)')
       .eq('user_id', user.id)
     // The UI uses only the first (oldest) family for now; the schema supports many.
     const rows = ((data ?? []) as unknown as Membership[]).sort((a, b) =>
@@ -57,7 +58,9 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       permissions = Object.fromEntries((perms ?? []).map((p) => [p.module, p.access as Level]))
     }
     setState({
-      family: first ? { id: first.families.id, name: first.families.name } : null,
+      family: first
+        ? { id: first.families.id, name: first.families.name, home_state: first.families.home_state }
+        : null,
       role: first?.role ?? null,
       permissions,
       loading: false,
