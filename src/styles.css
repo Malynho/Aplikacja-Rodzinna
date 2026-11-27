@@ -730,10 +730,44 @@ h3 {
 }
 
 /* Calendar filter chips, event lines, the "next event" counter */
+/* a link that looks like the primary button */
+a.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  color: var(--on-accent);
+  text-decoration: none;
+}
+
+/* the day panel of the calendar (event list and form): touch-sized controls */
+.calendar-card .input,
+.calendar-card .segmented button,
+.calendar-card .link-btn,
+.calendar-card .chip,
+.calendar-card label.row {
+  min-height: 44px;
+}
+
+.calendar-card p a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.updated {
+  font-size: 0.8rem;
+  margin: 0;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.chip:disabled {
+  opacity: 0.4;
 }
 
 .chip {
@@ -741,12 +775,14 @@ h3 {
   padding: 0 16px;
   border-radius: 999px;
   background: var(--track);
+  box-shadow: inset 0 0 0 1px var(--text-muted); /* visible even where the track color equals the card */
   font-weight: 600;
 }
 
 .chip[aria-pressed='true'] {
   background: var(--accent);
   color: var(--on-accent);
+  box-shadow: none;
 }
 
 .event-line {
@@ -765,6 +801,10 @@ h3 {
 
 .event-cal {
   font-size: 0.8rem;
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .next-event {

@@ -10,6 +10,9 @@ export interface CalendarEvent {
   all_day: boolean
   location: string | null
   private: boolean
+  etag: string // for safe edits (If-Match in Google)
+  recurring: boolean // recurring events are read-only here
+  editable: boolean // a hint: the Edge Function checks the rights again on every write
 }
 
 const DAY_MS = 86_400_000

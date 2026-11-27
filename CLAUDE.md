@@ -26,6 +26,15 @@ wrangler.jsonc     Cloudflare Workers static assets config (SPA routing)
 
 Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run build`, assets in `dist`.
 
+## Working mode (set by the owner)
+
+1. UI tasks and small changes: do them right away, no plan and no questions. Describe the default decisions in the summary.
+2. A plan and questions only for: migrations with RLS, tokens or permissions; architecture changes; anything irreversible.
+3. Run `npm run build`, `npm run db:dry` and the layout check (360/390/768/1280 px) yourself. UI text only in `pl.json` and `de.json`.
+4. Never without the owner's explicit OK: `db:push`, `fn:deploy`, commit and push. Secrets never go into the repo, the chat or logs.
+5. Combine related tasks in one pass. End with a short summary: what was done, and what the owner has to do by hand, in one table.
+6. Ordinary migrations (e.g. adding a column) are checked by you (`db:dry`); show the SQL for review only when it touches RLS, tokens or permissions.
+
 ## Rules
 
 - Write only the code needed now. No speculative abstractions, no unused files.
@@ -73,6 +82,15 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   Events are read live with the token of the calendar's OWNER and never stored; the user id always comes from getUser().
   Permission module `calendar`. `calendar_links` always has an owner; "shared" ones are registered by admins; a private
   link is invisible to everyone but its owner (admins too). Private/confidential events are masked for non-owners.
+  Start page filter: `profiles.calendar_filter` holds the ids of calendars switched OFF (nothing saved = all visible
+  calendars on: own + family-visible), one chip per calendar.
+- Calendar writing (4c): actions create_event / update_event / delete_event in `calendar`. The target calendar always comes from
+  `calendar_links` read with the caller's client (RLS) and must be the family calendar (shared) or the caller's own; Google
+  IDs from the client are never used. Writes use the AUTHOR's own token only, after a live check of the author's role
+  (owner/writer) in Google and the limit `claim_calendar_write` (60/h). Bodies are built from validated fields only (no
+  description or attendees; edits are PATCH with If-Match, sendUpdates=none); recurring events are read-only. "Only me" =
+  the person's private calendar and Google visibility private. Reads: client polls every 45 s while the tab is visible,
+  function cache 15 s and 20 reads/min per person.
 - Receipt scanning (`scan-receipt` + `apply_receipt`): nothing changes before the user confirms; the approval
   button is locked from the first click until saving ends.
 - Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`

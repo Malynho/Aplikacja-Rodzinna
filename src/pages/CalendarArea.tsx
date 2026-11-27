@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useCalendarEvents } from '../hooks/useCalendarEvents'
 import { useCalendarSettings } from '../hooks/useCalendarSettings'
 import { addDays } from '../lib/date'
@@ -12,20 +13,26 @@ const WINDOW_DAYS = 30
 export function CalendarArea({ familyId, userId, homeState }: { familyId: string; userId: string; homeState: string }) {
   const settings = useCalendarSettings(familyId, userId)
   const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-  const data = useCalendarEvents(familyId, today.getTime(), addDays(today, WINDOW_DAYS).getTime())
+  const [version, setVersion] = useState(0) // bumped after an own create / update / delete: both lists refresh at once
+  const data = useCalendarEvents(familyId, today.getTime(), addDays(today, WINDOW_DAYS).getTime(), version)
   const events = data.events.filter((e) => settings.isOn(e.calendar_link_id))
+  const errors = data.errors.filter((e) => settings.isOn(e.calendar_link_id))
 
   return (
     <>
       <NextEventCounter events={events} />
       <div className="dashboard">
-        <MonthCalendar homeState={homeState} calendar={{ familyId, settings }} />
+        <MonthCalendar
+          homeState={homeState}
+          calendar={{ familyId, settings, refreshKey: version, onChanged: () => setVersion((v) => v + 1) }}
+        />
         <UpcomingEvents
           settings={settings}
           events={events}
+          errors={errors}
           loaded={data.loaded}
           failed={data.failed !== null}
-          partial={data.errors.some((e) => settings.isOn(e.calendar_link_id))}
+          updatedAt={data.updatedAt}
           days={WINDOW_DAYS}
         />
       </div>

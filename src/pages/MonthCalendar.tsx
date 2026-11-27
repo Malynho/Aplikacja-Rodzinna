@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCalendarEvents } from '../hooks/useCalendarEvents'
+import { useModuleAccess } from '../hooks/useModuleAccess'
 import type { CalendarSettings } from '../hooks/useCalendarSettings'
 import { daysOf, type CalendarEvent } from '../lib/calendar'
 import { addDays, isoWeek, mondayOf, toDay } from '../lib/date'
+import { functionErrorCode } from '../lib/functionError'
 import { appliesTo, useHolidays } from '../lib/holidays'
+import { supabase } from '../lib/supabase'
+import { EventForm } from './EventForm'
 import { EventLine } from './EventLine'
 
 const FLAGS = { PL: '🇵🇱', DE: '🇩🇪' }
@@ -13,7 +17,8 @@ const firstOfThisMonth = () => new Date(new Date().getFullYear(), new Date().get
 
 interface Props {
   homeState: string
-  calendar?: { familyId: string; settings: CalendarSettings } // without it only holidays are shown
+  // without it only holidays are shown; refreshKey / onChanged: own writes refresh every list on the page
+  calendar?: { familyId: string; settings: CalendarSettings; refreshKey: number; onChanged: () => void }
 }
 
 // Month view (weeks start on Monday) with week numbers, today, PL / DE (home state) holidays and,
@@ -23,13 +28,16 @@ export function MonthCalendar({ homeState, calendar }: Props) {
   const [month, setMonth] = useState(firstOfThisMonth)
   const today = toDay(new Date())
   const [selected, setSelected] = useState(today)
+  const canWrite = useModuleAccess('calendar') === 'write'
+  const [form, setForm] = useState<{ event?: CalendarEvent } | null>(null) // the event form: new, or editing
+  const [writeError, setWriteError] = useState<string | null>(null)
 
   const start = mondayOf(month)
   const last = new Date(month.getFullYear(), month.getMonth() + 1, 0)
   const weeks = Math.round((mondayOf(last).getTime() - start.getTime()) / (7 * 86400000)) + 1
   const holidays = useHolidays([start.getFullYear(), last.getFullYear()])
   const settings = calendar?.settings
-  const loaded = useCalendarEvents(calendar?.familyId ?? null, start.getTime(), addDays(start, weeks * 7).getTime())
+  const loaded = useCalendarEvents(calendar?.familyId ?? null, start.getTime(), addDays(start, weeks * 7).getTime(), calendar?.refreshKey ?? 0)
 
   // holidays by day: Poland always, Germany only when it applies in the family's state
   const byDay = new Map<string, { country: 'PL' | 'DE'; name: string }[]>()
@@ -53,6 +61,19 @@ export function MonthCalendar({ homeState, calendar }: Props) {
   const dayMonth = new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short' })
   const shift = (by: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + by, 1))
   const selectedEvents = eventsByDay.get(selected) ?? []
+
+  async function remove(e: CalendarEvent) {
+    if (!calendar || !window.confirm(t('calendar.confirmDelete', { title: e.title ?? t('calendar.private') }))) return
+    const { error: err } = await supabase.functions.invoke('calendar', {
+      body: { action: 'delete_event', family_id: calendar.familyId, calendar_link_id: e.calendar_link_id, event_id: e.id },
+    })
+    if (err) {
+      setWriteError(await functionErrorCode(err, 'function_error'))
+    } else {
+      setWriteError(null)
+      calendar.onChanged()
+    }
+  }
 
   return (
     <div className="card stack calendar-card">
@@ -126,21 +147,68 @@ export function MonthCalendar({ homeState, calendar }: Props) {
           ]
         })}
       </div>
-      {settings && (
+      {settings && calendar && (
         <div className="stack">
-          <h3>{new Intl.DateTimeFormat(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${selected}T12:00:00`))}</h3>
-          {selectedEvents.length === 0 ? (
+          <div className="row">
+            <h3 className="grow">
+              {new Intl.DateTimeFormat(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${selected}T12:00:00`))}
+            </h3>
+            {canWrite && !form && (
+              <button
+                className="link-btn"
+                onClick={() => {
+                  setWriteError(null)
+                  setForm({})
+                }}
+              >
+                {t('calendar.addEvent')}
+              </button>
+            )}
+          </div>
+          {form ? (
+            <EventForm
+              key={form.event?.id ?? 'new'}
+              familyId={calendar.familyId}
+              day={selected}
+              event={form.event}
+              settings={settings}
+              onSaved={() => {
+                setForm(null)
+                calendar.onChanged()
+              }}
+              onCancel={() => setForm(null)}
+            />
+          ) : selectedEvents.length === 0 ? (
             <p className="muted">{t('calendar.noneOnDay')}</p>
           ) : (
             selectedEvents.map((e) => (
-              <EventLine
-                key={`${e.calendar_link_id}${e.id}`}
-                event={e}
-                color={settings.colorOf(e.calendar_link_id)}
-                calendar={settings.labelOf(e.calendar_link_id)}
-              />
+              <div key={`${e.calendar_link_id}${e.id}`} className="stack">
+                <EventLine
+                  event={e}
+                  color={settings.colorOf(e.calendar_link_id)}
+                  calendar={settings.labelOf(e.calendar_link_id)}
+                />
+                {e.recurring && <p className="muted">{t('calendar.recurringNote')}</p>}
+                {canWrite && e.editable && (
+                  <div className="row">
+                    <button
+                      className="link-btn"
+                      onClick={() => {
+                        setWriteError(null)
+                        setForm({ event: e })
+                      }}
+                    >
+                      {t('calendar.editEvent')}
+                    </button>
+                    <button className="link-btn" onClick={() => remove(e)}>
+                      {t('calendar.deleteEvent')}
+                    </button>
+                  </div>
+                )}
+              </div>
             ))
           )}
+          {writeError && <p className="error">{t(`calendars.errors.${writeError}`)}</p>}
         </div>
       )}
       {inMonth.length > 0 && (
