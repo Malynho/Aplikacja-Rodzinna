@@ -235,6 +235,10 @@
         "title": "Kassenbon-Fotos",
         "text": "Das Foto eines Kassenbons wird nur zum Auslesen der Positionen an die API von Anthropic gesendet. Wir speichern es weder in der Datenbank noch in Dateien und schreiben es nicht in Protokolle."
       },
+      "recipes": {
+        "title": "Rezeptimport",
+        "text": "Wenn du ein Rezept aus einem Foto, einem Screenshot oder eingefügtem Text importierst (später auch aus einem Link), werden Fotos, Text und Seiteninhalte nur zum Auslesen des Rezepts an die API von Anthropic gesendet. Wir speichern sie weder in der Datenbank noch in Dateien und schreiben sie nicht in Protokolle. Gespeichert wird nur das Rezept, das du selbst bestätigst."
+      },
       "services": {
         "title": "Wetter und Feiertage",
         "text": "Das Wetter kommt von Open-Meteo, die Feiertage von Nager.Date. Dorthin senden wir nur die Koordinaten des Ortes (Wetter) bzw. den Ländercode und das Jahr (Feiertage), ohne Namen, E-Mail oder andere personenbezogene Daten."
@@ -256,6 +260,37 @@
     "contactTitle": "Kontakt",
     "contactText": "Fragen und Anträge auf Löschung der Daten:",
     "back": "Zurück zur App"
+  },
+  "todo": {
+    "views": { "today": "Heute", "week": "Woche", "all": "Alle", "done": "Erledigt" },
+    "quickAdd": "Aufgabe hinzufügen…",
+    "add": "Hinzufügen",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "empty": {
+      "today": "Für heute ist nichts zu tun.",
+      "week": "Für diese Woche ist nichts geplant.",
+      "all": "Keine Aufgaben.",
+      "done": "Keine erledigten Aufgaben der letzten 30 Tage."
+    },
+    "form": {
+      "title": "Titel",
+      "details": "Details",
+      "due": "Fällig",
+      "priority": "Priorität",
+      "priorities": { "0": "Keine", "1": "Niedrig", "2": "Mittel", "3": "Hoch" },
+      "assignee": "Zuständig",
+      "nobody": "Niemand",
+      "visibility": "Sichtbarkeit",
+      "visibilityOptions": { "family": "Familie", "private": "Privat" }
+    },
+    "confirmVisibility": {
+      "family": "Die Aufgabe sehen alle in der Familie. Ändern?",
+      "private": "Die Aufgabe siehst nur du. Bei anderen kann sie bis zum Neuladen der Seite sichtbar bleiben. Ändern?"
+    },
+    "doneToast": "Erledigt: {{title}}",
+    "removed": "Entfernt: {{title}}",
+    "error": "Die Änderung konnte nicht gespeichert werden."
   },
   "kitchen": {
     "tabs": {
@@ -315,6 +350,46 @@
     },
     "units": { "g": "g", "kg": "kg", "ml": "ml", "l": "l", "pcs": "Stk", "tbsp": "EL", "tsp": "TL" },
     "recipes": {
+      "source": "Quelle des Rezepts",
+      "addMenu": {
+        "manual": "Manuell",
+        "photo": "Foto / Screenshot",
+        "text": "Text einfügen",
+        "link": "Link",
+        "soon": "kommt bald"
+      },
+      "import": {
+        "photoTitle": "Rezept aus Foto",
+        "textTitle": "Rezept aus Text",
+        "privacy": "Fotos und Text werden zum Auslesen (Anthropic) gesendet und nicht gespeichert. Es wird nichts gespeichert, bevor du es bestätigst.",
+        "photoHint": "Wähle Fotos oder Screenshots eines Rezepts (bis zu {{max}} Bilder).",
+        "pick": "Fotos auswählen",
+        "picked_one": "{{count}} Foto",
+        "picked_other": "{{count}} Fotos",
+        "textHint": "Rezepttext einfügen (mind. 20 Zeichen)",
+        "read": "Rezept auslesen",
+        "reading": "Rezept wird ausgelesen…",
+        "reviewTitle": "Rezept prüfen",
+        "reviewHint": "Korrigiere, was nötig ist. Zutaten ohne Treffer sind markiert: wähle ein Produkt, lege mit einem Tipp ein neues an oder lass es als Text.",
+        "left": "Heute noch möglich: {{count}} Importe",
+        "truncated": "Das Rezept hat mehr als 60 Zutaten, die ersten 60 wurden übernommen.",
+        "noMatch": "Kein Treffer",
+        "uncertain": "unsicher",
+        "change": "Ändern",
+        "candidates": "Beste Treffer (🏠 = im Vorrat)",
+        "createNew": "Neues Produkt anlegen",
+        "asText": "Nur als Text",
+        "newProduct": "Neues Produkt: {{name}}",
+        "errors": {
+          "limit_reached": "Tageslimit erreicht ({{limit}} Importe), morgen wieder möglich",
+          "forbidden": "Du darfst keine Rezepte hinzufügen.",
+          "bad_request": "Ungültige Daten. Prüfe die Fotos oder den Text.",
+          "no_recipe_found": "Kein Rezept gefunden. Versuche es mit einem klareren Foto oder dem ganzen Text.",
+          "import_failed": "Das Rezept konnte nicht ausgelesen werden. Versuche es gleich noch einmal.",
+          "image": "Das Foto konnte nicht geladen werden.",
+          "not_deployed": "Die Importfunktion ist noch nicht bereitgestellt."
+        }
+      },
       "add": "Rezept hinzufügen",
       "search": "Rezept suchen…",
       "empty": "Noch keine Rezepte. Füge das erste hinzu.",

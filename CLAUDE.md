@@ -56,7 +56,7 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
   Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
-  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state, 0013 calendar links, 0014 Google OAuth, 0015 calendar filter, 0016 calendar write limit, 0017 pantry rise cleans list. Next: 0018.
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state, 0013 calendar links, 0014 Google OAuth, 0015 calendar filter, 0016 calendar write limit, 0017 pantry rise cleans list, 0018 to-do core, 0019 recipe import. Next: 0020.
   Pantry triggers: bought shopping item (checked false->true) raises `ist`; a falling `ist` sets the open shopping
   item to `soll - ist` (`add_pantry_shortages`). Neither trigger touches the column that fires the other (no loop).
   0017: a RISING `ist` (trigger `pantry_items_rise`) lowers the open item to max(0, soll - ist) and deletes it at 0 (hard
@@ -93,6 +93,19 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   description or attendees; edits are PATCH with If-Match, sendUpdates=none); recurring events are read-only. "Only me" =
   the person's private calendar and Google visibility private. Reads: client polls every 45 s while the tab is visible,
   function cache 15 s and 20 reads/min per person.
+- To-do (`todos`, 0018) and later notes: every row has `owner_user_id` + `visibility` ('private' | 'family'); policies come from
+  `apply_visibility_policies(tbl, module)` (private rows only for their owner, admins too; any member with write edits family
+  rows; a non-owner can never make a family row private). New members get calendar/todo/notes write
+  (`default_member_permissions`). Before a member row is deleted `reassign_family_content` hands their FAMILY content to an
+  admin (the guards accept the owner change only through the `app.reassign` setting); private content goes with them.
+  Live data: `useTodos` (same Realtime pattern, `applyChange` in `src/lib/realtime.ts`).
+- Recipe import (phase 1: photos and pasted text; links come in phase 2 with SSRF protection): Edge Function `import-recipe` only
+  READS (no storage, no logging of input); the user confirms on an editable screen, then `save_recipe_import` (security invoker, validates
+  everything again, creates new products, learns `ingredient_aliases` - separate from `receipt_aliases` - and saves the recipe in one
+  transaction). Daily limit per family: `claim_recipe_import`, default 5, changeable with the secret RECIPE_IMPORT_DAILY_LIMIT
+  (read per request, no redeploy). The model sees `in_pantry` (computed on the server from pantry_items); `src/lib/ingredientMatch.ts`
+  adds the same pantry bonus and the hints (Dose, gehackte, passierte, frische) on the client. Steps are plain text; `source_url` is
+  shown as a link only when it starts with https://.
 - Receipt scanning (`scan-receipt` + `apply_receipt`): nothing changes before the user confirms; the approval
   button is locked from the first click until saving ends.
 - Module tables get their RLS through `select public.apply_module_policies('<table>', '<module>', <with_delete>)`

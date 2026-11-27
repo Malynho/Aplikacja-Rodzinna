@@ -92,6 +92,13 @@ export function RecipeView({ recipe, ingredients, shop, canWrite, onEdit, onDele
       )}
       {shop.error && <p className="error">{t(`kitchen.shopping.${shop.error}`)}</p>}
 
+      {recipe.source_url?.startsWith('https://') && (
+        <p>
+          <a href={recipe.source_url} target="_blank" rel="noopener noreferrer">
+            {t('kitchen.recipes.source')}
+          </a>
+        </p>
+      )}
       {recipe.steps && (
         <>
           <h3>{t('kitchen.recipes.steps')}</h3>

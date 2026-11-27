@@ -255,6 +255,11 @@ h3 {
   gap: 12px;
 }
 
+/* grid items may shrink below their content (a wide select or input must not widen the whole card) */
+.stack > * {
+  min-width: 0;
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -274,6 +279,11 @@ h3 {
   border-radius: 999px;
   padding: 10px 16px;
   min-width: 0;
+  min-height: 44px; /* touch size */
+}
+
+.field.grow > .input {
+  width: 100%;
 }
 
 .error {
@@ -888,6 +898,103 @@ a.primary {
 
 .legal a {
   color: var(--accent);
+}
+
+/* To-do list */
+/* touch-sized controls; the view switch wraps instead of overflowing on a phone */
+.todo-page .input,
+.todo-page .segmented button,
+.todo-page .link-btn,
+.todo-page .chip,
+.todo-page .primary {
+  min-height: 44px;
+}
+
+.todo-page .view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 22px;
+}
+
+.todo-page .view-switch button {
+  flex: 1 1 auto;
+}
+
+.todo-main {
+  min-height: 44px;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.todo-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.todo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 0.85rem;
+}
+
+.todo-meta:empty {
+  display: none;
+}
+
+.todo-meta .overdue {
+  color: var(--danger);
+  font-weight: 800;
+}
+
+.prio {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.prio-1 {
+  background: var(--text-muted);
+}
+
+.prio-2 {
+  background: var(--warning);
+}
+
+.prio-3 {
+  background: var(--danger);
+}
+
+.list-row.done .todo-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-form {
+  margin: 4px 0;
+}
+
+/* recipe import: touch-sized buttons (the small ✕, change, cancel) */
+.recipe-import button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.recipe-import select.input {
+  min-width: 72px;
+}
+
+/* the "add recipe" options */
+.recipe-menu .link-btn {
+  min-height: 44px;
+  text-align: left;
 }
 
 /* Recipe steps keep the line breaks of the text. */

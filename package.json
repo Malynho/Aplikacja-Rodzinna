@@ -11,7 +11,8 @@
     "db:dry": "supabase db push --dry-run --remote",
     "db:push": "supabase db push --remote",
     "fn:deploy": "supabase functions deploy scan-receipt --remote --use-api",
-    "fn:deploy:calendar": "supabase functions deploy calendar --remote --use-api"
+    "fn:deploy:calendar": "supabase functions deploy calendar --remote --use-api",
+    "fn:deploy:import-recipe": "supabase functions deploy import-recipe --remote --use-api"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",

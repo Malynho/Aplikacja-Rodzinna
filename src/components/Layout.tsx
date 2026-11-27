@@ -23,10 +23,14 @@ export function Layout() {
   const [open, setOpen] = useState(false) // mobile drawer state
   const kitchenAccess = useModuleAccess('kitchen')
   const calendarAccess = useModuleAccess('calendar')
+  const todoAccess = useModuleAccess('todo')
+  const notesAccess = useModuleAccess('notes')
   // Verwaltung: admins and users without a family yet (to create one). Kitchen: read or write access.
   const items = NAV_ITEMS.filter((i) => {
     if (i.key === 'admin') return !loading && (!family || role === 'admin')
     if (i.key === 'kitchen') return !loading && kitchenAccess !== 'none'
+    if (i.key === 'todo') return !loading && todoAccess !== 'none'
+    if (i.key === 'notes') return !loading && notesAccess !== 'none'
     if (i.key === 'settings') return !loading && calendarAccess !== 'none' // the only setting so far is the calendar
     return true
   })

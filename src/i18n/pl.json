@@ -239,6 +239,10 @@
         "title": "Zdjęcia paragonów",
         "text": "Zdjęcie paragonu jest wysyłane do API firmy Anthropic wyłącznie po to, aby odczytać pozycje. Nie zapisujemy go w bazie danych ani w plikach i nie umieszczamy go w logach."
       },
+      "recipes": {
+        "title": "Import przepisów",
+        "text": "Jeśli importujesz przepis ze zdjęcia, zrzutu ekranu albo wklejonego tekstu (a później także z linku), zdjęcia, tekst i treść stron są wysyłane do API firmy Anthropic wyłącznie po to, aby odczytać przepis. Nie zapisujemy ich w bazie danych ani w plikach i nie umieszczamy ich w logach. Zapisujemy tylko przepis, który sam zatwierdzisz."
+      },
       "services": {
         "title": "Pogoda i święta",
         "text": "Pogodę pobieramy z Open-Meteo, a święta z Nager.Date. Wysyłamy tam tylko współrzędne miejsca (pogoda) albo kod kraju i rok (święta), bez imienia, e-maila i innych danych osobowych."
@@ -260,6 +264,37 @@
     "contactTitle": "Kontakt",
     "contactText": "Pytania i prośby o usunięcie danych:",
     "back": "Wróć do aplikacji"
+  },
+  "todo": {
+    "views": { "today": "Dziś", "week": "Tydzień", "all": "Wszystkie", "done": "Zrobione" },
+    "quickAdd": "Dodaj zadanie…",
+    "add": "Dodaj",
+    "today": "Dziś",
+    "tomorrow": "Jutro",
+    "empty": {
+      "today": "Na dziś nic do zrobienia.",
+      "week": "Nic na ten tydzień.",
+      "all": "Brak zadań.",
+      "done": "Brak zrobionych zadań z ostatnich 30 dni."
+    },
+    "form": {
+      "title": "Tytuł",
+      "details": "Szczegóły",
+      "due": "Termin",
+      "priority": "Priorytet",
+      "priorities": { "0": "Brak", "1": "Niski", "2": "Średni", "3": "Wysoki" },
+      "assignee": "Zajmuje się",
+      "nobody": "Nikt",
+      "visibility": "Widoczność",
+      "visibilityOptions": { "family": "Rodzina", "private": "Prywatne" }
+    },
+    "confirmVisibility": {
+      "family": "Zadanie zobaczą wszyscy z rodziny. Zmienić?",
+      "private": "Zadanie zobaczysz tylko Ty. U innych osób może być widoczne do odświeżenia strony. Zmienić?"
+    },
+    "doneToast": "Zrobione: {{title}}",
+    "removed": "Usunięto: {{title}}",
+    "error": "Nie udało się zapisać zmiany."
   },
   "kitchen": {
     "tabs": {
@@ -319,6 +354,48 @@
     },
     "units": { "g": "g", "kg": "kg", "ml": "ml", "l": "l", "pcs": "szt", "tbsp": "łyżka", "tsp": "łyżeczka" },
     "recipes": {
+      "source": "Źródło przepisu",
+      "addMenu": {
+        "manual": "Ręcznie",
+        "photo": "Ze zdjęcia lub zrzutu ekranu",
+        "text": "Wklej tekst",
+        "link": "Z linku",
+        "soon": "wkrótce"
+      },
+      "import": {
+        "photoTitle": "Przepis ze zdjęcia",
+        "textTitle": "Przepis z tekstu",
+        "privacy": "Zdjęcia i tekst są wysyłane do odczytu (Anthropic) i nie są zapisywane. Nic nie zostanie zapisane, dopóki tego nie zatwierdzisz.",
+        "photoHint": "Wybierz zdjęcia lub zrzuty ekranu jednego przepisu (do {{max}} obrazów).",
+        "pick": "Wybierz zdjęcia",
+        "picked_one": "{{count}} zdjęcie",
+        "picked_few": "{{count}} zdjęcia",
+        "picked_many": "{{count}} zdjęć",
+        "picked_other": "{{count}} zdjęcia",
+        "textHint": "Wklej tekst przepisu (min. 20 znaków)",
+        "read": "Odczytaj przepis",
+        "reading": "Odczytuję przepis…",
+        "reviewTitle": "Sprawdź przepis",
+        "reviewHint": "Popraw, co trzeba. Składniki bez dopasowania są oznaczone: wybierz produkt, utwórz nowy jednym dotknięciem albo zostaw jako tekst.",
+        "left": "Pozostało importów dzisiaj: {{count}}",
+        "truncated": "Przepis ma więcej niż 60 składników, zapisano pierwsze 60.",
+        "noMatch": "Brak dopasowania",
+        "uncertain": "niepewne",
+        "change": "Zmień",
+        "candidates": "Najlepsze dopasowania (🏠 = masz w spiżarni)",
+        "createNew": "Utwórz nowy produkt",
+        "asText": "Tylko tekst",
+        "newProduct": "Nowy produkt: {{name}}",
+        "errors": {
+          "limit_reached": "Osiągnięto dzienny limit ({{limit}} importów), jutro znów możliwe.",
+          "forbidden": "Nie masz uprawnień do dodawania przepisów.",
+          "bad_request": "Nieprawidłowe dane. Sprawdź zdjęcia lub tekst.",
+          "no_recipe_found": "Nie znaleziono przepisu. Spróbuj z wyraźniejszym zdjęciem lub pełnym tekstem.",
+          "import_failed": "Nie udało się odczytać przepisu. Spróbuj ponownie za chwilę.",
+          "image": "Nie udało się wczytać zdjęcia.",
+          "not_deployed": "Funkcja importu nie jest jeszcze wdrożona."
+        }
+      },
       "add": "Dodaj przepis",
       "search": "Szukaj przepisu…",
       "empty": "Brak przepisów. Dodaj pierwszy.",

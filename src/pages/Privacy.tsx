@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Controls } from '../components/Controls'
 
-const SECTIONS = ['data', 'calendar', 'receipts', 'services', 'sharing', 'deletion', 'google'] as const
+const SECTIONS = ['data', 'calendar', 'receipts', 'recipes', 'services', 'sharing', 'deletion', 'google'] as const
 const CONTACT = 'malynho@gmail.com'
 const GOOGLE_POLICY = 'https://developers.google.com/terms/api-services-user-data-policy'
 

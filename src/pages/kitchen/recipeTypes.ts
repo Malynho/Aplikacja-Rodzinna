@@ -1,3 +1,5 @@
+import type { Category } from './products'
+
 export const COUNTRIES = ['PL', 'DE', 'IT', 'FR', 'ES', 'GR', 'TR', 'CN', 'JP', 'IN', 'MX', 'US', 'GB', 'TH'] as const
 
 export const RECIPE_UNITS = ['g', 'ml', 'pcs', 'tbsp', 'tsp'] as const
@@ -15,6 +17,7 @@ export interface Recipe {
   servings: number
   minutes: number | null
   steps: string
+  source_url: string | null // https only
   updated_at: string
   deleted_at: string | null
 }
@@ -69,3 +72,47 @@ export const flag = (code: string) => String.fromCodePoint(...[...code].map((c) 
 // Amount for display: up to 2 decimals, no trailing zeros.
 export const formatAmount = (value: number, language: string) =>
   new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value)
+
+// Recipe import (phase 1: text and photos). What the Edge Function "import-recipe" returns ...
+export interface ImportedIngredient {
+  raw_text: string // as written in the source
+  name: string
+  amount: number
+  unit: RecipeUnit
+  staple: boolean
+  product_id: string | null // the model's choice from the catalog
+  uncertain: boolean
+  new_product: { name: string; category: Category; emoji: string } | null // suggestion when there is no match
+}
+
+export interface ImportedRecipe {
+  title: string
+  lang: RecipeLang | null // null = the language of the app
+  country: string | null
+  servings: number | null
+  minutes: number | null
+  steps: string
+  ingredients: ImportedIngredient[]
+  truncated: boolean // the source had more than 60 ingredients
+}
+
+// ... and what save_recipe_import takes after the user has confirmed (the database validates all of it again).
+export interface ImportRecipePayload {
+  title: string
+  lang: RecipeLang
+  country: string | null
+  servings: number
+  minutes: number | null
+  steps: string
+  source_url: string | null
+}
+
+export interface ImportIngredientPayload {
+  name: string
+  amount: number
+  unit: RecipeUnit
+  staple: boolean
+  product_id?: string
+  new_product?: { name: string; category: Category; emoji: string }
+  alias?: string // the ingredient text the user matched or corrected (learned in ingredient_aliases)
+}

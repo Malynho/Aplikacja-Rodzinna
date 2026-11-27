@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import i18n from '../i18n'
-import { functionErrorCode } from '../lib/functionError'
+import { functionErrorDetails } from '../lib/functionError'
+import { applyChange } from '../lib/realtime'
 import { supabase } from '../lib/supabase'
 import { STARTER_PRODUCTS } from '../pages/kitchen/starterProducts'
 import {
@@ -16,39 +17,21 @@ import {
   type ReceiptResult,
   type ShoppingItem,
 } from '../pages/kitchen/products'
-import type { Ingredient, IngredientValues, MealWish, Recipe, RecipeValues, WishValues } from '../pages/kitchen/recipeTypes'
+import type {
+  ImportedRecipe,
+  ImportIngredientPayload,
+  ImportRecipePayload,
+  Ingredient,
+  IngredientValues,
+  MealWish,
+  Recipe,
+  RecipeValues,
+  WishValues,
+} from '../pages/kitchen/recipeTypes'
 
 const RECENT_LIMIT = 10
 
-type Row = { id: string; updated_at: string }
 type ErrorKey = 'alreadyOnList' | 'error'
-
-// Merges a Realtime row into the map. Idempotent, so our own change arriving twice is harmless,
-// and an older event never overwrites a newer row.
-// A DELETE event (only recipe ingredients are deleted for real) removes the row.
-function applyChange<T extends Row>(set: Dispatch<SetStateAction<Map<string, T>>>) {
-  return (payload: { eventType?: string; new: Record<string, unknown>; old?: Record<string, unknown> }) => {
-    if (payload.eventType === 'DELETE') {
-      const id = payload.old?.id as string | undefined
-      if (id) {
-        set((prev) => {
-          if (!prev.has(id)) return prev
-          const next = new Map(prev)
-          next.delete(id)
-          return next
-        })
-      }
-      return
-    }
-    const row = payload.new as unknown as T
-    if (!row?.id) return
-    set((prev) => {
-      const current = prev.get(row.id)
-      if (current && current.updated_at > row.updated_at) return prev
-      return new Map(prev).set(row.id, row)
-    })
-  }
-}
 
 // Products, shopping list and pantry of one family, kept live via Supabase Realtime.
 // Actions only write to the database; the UI updates from the Realtime event (no double writes).
@@ -207,7 +190,7 @@ export function useKitchen(familyId: string) {
         body: { family_id: familyId, image_base64: imageBase64, catalog },
       })
       if (err) {
-        const code = await functionErrorCode(err, 'scan_failed')
+        const code = (await functionErrorDetails(err, 'scan_failed')).code
         return { error: ['forbidden', 'limit_reached', 'bad_request'].includes(code) ? code : 'scan_failed' }
       }
       return { items: (data?.items ?? []) as ReceiptItem[] }
@@ -218,6 +201,32 @@ export function useKitchen(familyId: string) {
       setError(err ? 'error' : null)
       if (!subscribed.current) await load()
       return err ? null : (data as ReceiptResult)
+    },
+    // Recipe import: the photos / the text go to the Edge Function, which only reads (nothing is stored there).
+    importRecipe: async (
+      payload: { kind: 'text'; text: string } | { kind: 'images'; images: string[] },
+    ): Promise<{ recipe: ImportedRecipe; left: number } | { error: string; limit?: number }> => {
+      const pl = i18n.getFixedT('pl')
+      const de = i18n.getFixedT('de')
+      const catalog = [...products.values()]
+        .filter((p) => !p.deleted_at)
+        .map((p) => ({ id: p.id, names: p.seed_key ? [productLabel(p, pl), productLabel(p, de)] : [productLabel(p, de)] }))
+      const { data, error: err } = await supabase.functions.invoke('import-recipe', {
+        body: { family_id: familyId, ...payload, catalog },
+      })
+      if (err) {
+        const { code, body } = await functionErrorDetails(err, 'import_failed')
+        const known = ['forbidden', 'limit_reached', 'bad_request', 'no_recipe_found', 'not_deployed']
+        return { error: known.includes(code) ? code : 'import_failed', limit: typeof body?.limit === 'number' ? body.limit : undefined }
+      }
+      return { recipe: data.recipe as ImportedRecipe, left: data.imports_left as number }
+    },
+    // The confirmed import in ONE database call: new products, learned aliases and the recipe. Returns the id or null.
+    saveRecipeImport: async (recipe: ImportRecipePayload, ingredients: ImportIngredientPayload[]): Promise<string | null> => {
+      const { data, error: err } = await supabase.rpc('save_recipe_import', { fid: familyId, recipe, ingredients })
+      setError(err ? 'error' : null)
+      if (!subscribed.current) await load()
+      return err ? null : (data as string)
     },
     // Recipe + ingredients in one transaction (rid = null creates). Returns the recipe id or null on failure.
     saveRecipe: async (rid: string | null, recipe: RecipeValues, list: IngredientValues[]): Promise<string | null> => {
