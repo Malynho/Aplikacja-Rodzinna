@@ -138,6 +138,7 @@
       "noPrivate": "Nie masz prywatnego kalendarza z prawem zapisu.",
       "settingsLink": "Dodaj go w Ustawieniach",
       "noShared": "Brak wspólnego kalendarza rodziny.",
+      "sharedLinkAdmin": "Dodaj go w Administracji",
       "reminders": "Przypomnienia",
       "reminderMode": { "keep": "Bez zmian", "default": "Domyślne kalendarza", "custom": "Własne" },
       "reminderChoice": {
@@ -188,6 +189,7 @@
     },
     "pick": "Kalendarz Google",
     "pickPlaceholder": "Wybierz kalendarz…",
+    "noneToAdd": "Brak kalendarzy do dodania: wszystkie są już dodane. Kalendarza, którego tu nie widzisz, nie ma na Twojej liście w Google. Dodaj go lub zaakceptuj zaproszenie w Google Kalendarz (Inne kalendarze) i spróbuj ponownie.",
     "loadingList": "Wczytywanie kalendarzy…",
     "roles": { "owner": "właściciel", "writer": "edycja", "reader": "tylko odczyt" },
     "label": "Nazwa w aplikacji",

@@ -136,6 +136,7 @@
       "noPrivate": "Du hast keinen privaten Kalender mit Schreibrecht.",
       "settingsLink": "In den Einstellungen hinzufügen",
       "noShared": "Kein gemeinsamer Familienkalender vorhanden.",
+      "sharedLinkAdmin": "In der Verwaltung hinzufügen",
       "reminders": "Erinnerungen",
       "reminderMode": { "keep": "Unverändert", "default": "Standard des Kalenders", "custom": "Eigene" },
       "reminderChoice": {
@@ -184,6 +185,7 @@
     },
     "pick": "Google-Kalender",
     "pickPlaceholder": "Kalender auswählen…",
+    "noneToAdd": "Keine Kalender zum Hinzufügen: alle sind bereits hinzugefügt. Ein Kalender, den du hier nicht siehst, steht nicht in deiner Google-Kalenderliste. Füge ihn in Google Kalender hinzu oder nimm die Einladung an (Weitere Kalender) und versuche es erneut.",
     "loadingList": "Kalender werden geladen…",
     "roles": { "owner": "Eigentümer", "writer": "Bearbeiten", "reader": "nur Lesen" },
     "label": "Name in der App",

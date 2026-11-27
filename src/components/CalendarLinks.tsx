@@ -68,7 +68,7 @@ export function CalendarLinks({ familyId, shared, canWrite, title, intro }: Prop
   async function openAdd() {
     setDraft({ ...EMPTY })
     setError(null)
-    if (options) return
+    setOptions(null) // reload every time: a calendar added a moment ago must not be offered again
     const { data, error: err } = await supabase.functions.invoke('calendar', { body: { action: 'calendars', family_id: familyId } })
     if (err) {
       setError(await functionErrorCode(err, 'function_error'))
@@ -121,6 +121,7 @@ export function CalendarLinks({ familyId, shared, canWrite, title, intro }: Prop
   }
 
   const shownError = error ?? connection.error
+  const nothingToAdd = draft?.id === null && options !== null && options.length === 0
   const status = connection.status
 
   return (
@@ -185,7 +186,15 @@ export function CalendarLinks({ familyId, shared, canWrite, title, intro }: Prop
           </div>
         ))}
 
-        {draft && (
+        {draft && nothingToAdd && (
+          <div className="stack">
+            <p className="muted">{t('calendars.noneToAdd')}</p>
+            <button className="link-btn" onClick={() => setDraft(null)}>
+              {t('calendars.cancel')}
+            </button>
+          </div>
+        )}
+        {draft && !nothingToAdd && (
           <div className="stack">
             {draft.id === null && (
               <label className="field">

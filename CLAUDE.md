@@ -56,9 +56,11 @@ Cloudflare: Workers static assets via `wrangler.jsonc`; build command `npm run b
   A freshly created link is kept only in JS memory (never in storage) until the admin clicks "Gotowe/Fertig".
 - Migrations already applied in Supabase are never edited; schema changes go into a new numbered file.
   Numbering: 0001 init, 0002 profile theme, 0003 kitchen permission, 0004 invitations,
-  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state, 0013 calendar links, 0014 Google OAuth, 0015 calendar filter. Next: 0016.
+  (0005 intentionally unused), 0006 invitation label, 0007 kitchen shopping, 0008 kitchen pantry, 0009 receipts, 0010 pack size, 0011 recipes, 0012 family home state, 0013 calendar links, 0014 Google OAuth, 0015 calendar filter, 0016 calendar write limit, 0017 pantry rise cleans list. Next: 0018.
   Pantry triggers: bought shopping item (checked false->true) raises `ist`; a falling `ist` sets the open shopping
   item to `soll - ist` (`add_pantry_shortages`). Neither trigger touches the column that fires the other (no loop).
+  0017: a RISING `ist` (trigger `pantry_items_rise`) lowers the open item to max(0, soll - ist) and deletes it at 0 (hard
+  delete, so it is not in "recently deleted"); products with soll = 0 and ticked/soft-deleted rows are never touched.
 - Applying migrations (Supabase CLI 3.x targets the local stack by default, so the scripts always pass `--remote`
   for the linked project): new migrations are checked with `npm run db:dry` and applied with `npm run db:push`
   only after the user's explicit OK. After every migration show a short summary of the result

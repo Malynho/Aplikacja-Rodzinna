@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useFamily } from '../family/FamilyProvider'
 import type { CalendarSettings } from '../hooks/useCalendarSettings'
 import { endOf, startOf, type CalendarEvent } from '../lib/calendar'
 import { addDays, toDay } from '../lib/date'
@@ -29,6 +30,7 @@ const timeOf = (date: Date) => `${String(date.getHours()).padStart(2, '0')}:${St
 // "Only me" (the person's own private calendar). The Edge Function checks the rights again; nothing is trusted here.
 export function EventForm({ familyId, day, event, settings, onSaved, onCancel }: Props) {
   const { t } = useTranslation()
+  const { role } = useFamily()
   const { everyone, mine } = settings.writeTargets
   const editing = !!event
   const first = event ? startOf(event) : null
@@ -155,7 +157,17 @@ export function EventForm({ familyId, day, event, settings, onSaved, onCancel }:
               {t('calendar.form.noPrivate')} <Link to="/settings">{t('calendar.form.settingsLink')}</Link>
             </p>
           )}
-          {everyone.length === 0 && <p className="muted">{t('calendar.form.noShared')}</p>}
+          {everyone.length === 0 && (
+            <p className="muted">
+              {t('calendar.form.noShared')}
+              {role === 'admin' && (
+                <>
+                  {' '}
+                  <Link to="/admin">{t('calendar.form.sharedLinkAdmin')}</Link>
+                </>
+              )}
+            </p>
+          )}
           {group.length > 1 && (
             <select className="input" aria-label={t('calendar.form.calendar')} value={chosen} onChange={(e) => setLinkId(e.target.value)}>
               {group.map((l) => (

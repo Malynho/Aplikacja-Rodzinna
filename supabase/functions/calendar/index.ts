@@ -529,15 +529,34 @@ Deno.serve(async (req) => {
       if (!token.ok) {
         return fail(req, token.error === 'upstream_error' ? 502 : 409, token.error === 'revoked' ? 'reconnect' : token.error)
       }
-      const url = new URL(`${API}/users/me/calendarList`)
-      url.search = new URLSearchParams({
-        minAccessRole: 'reader',
-        maxResults: '250',
-        fields: 'items(id,summary,accessRole,primary)',
-      }).toString()
-      const result = await googleGet<{ items?: { id: string; summary?: string; accessRole: string; primary?: boolean }[] }>(token.token, url)
-      if (!result.ok) return fail(req, 502, result.error)
-      const calendars = (result.data.items ?? []).slice(0, 250).map((c) => ({
+      // The whole calendar list: hidden calendars too (they are left out by default) and every page.
+      interface ListedCalendar {
+        id: string
+        summary?: string
+        accessRole: string
+        primary?: boolean
+      }
+      const listed: ListedCalendar[] = []
+      let pageToken: string | undefined
+      for (let page = 0; page < 4; page++) {
+        const url = new URL(`${API}/users/me/calendarList`)
+        url.search = new URLSearchParams({
+          minAccessRole: 'reader',
+          showHidden: 'true',
+          maxResults: '250',
+          fields: 'nextPageToken,items(id,summary,accessRole,primary)',
+          ...(pageToken ? { pageToken } : {}),
+        }).toString()
+        const result = await googleGet<{ items?: ListedCalendar[]; nextPageToken?: string }>(token.token, url)
+        if (!result.ok) return fail(req, 502, result.error)
+        listed.push(...(result.data.items ?? []))
+        pageToken = result.data.nextPageToken
+        if (!pageToken) break
+      }
+      // calendars that are already registered in this family (as far as the caller's RLS shows them) are not offered again
+      const { data: registered } = await supabase.from('calendar_links').select('google_calendar_id').eq('family_id', familyId)
+      const taken = new Set((registered ?? []).map((r: { google_calendar_id: string }) => r.google_calendar_id))
+      const calendars = listed.filter((c) => !taken.has(c.id)).slice(0, 250).map((c) => ({
         id: text(c.id, 254),
         summary: text(c.summary, 100),
         access_role: c.accessRole,
